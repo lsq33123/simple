@@ -37,9 +37,11 @@ const permission = {
     GenerateRoutes({ commit }) {
       return new Promise(resolve => {
         // 向后端请求路由数据
-        getRouters().then(res => {
-          const sdata = JSON.parse(JSON.stringify(res.data))
-          const rdata = JSON.parse(JSON.stringify(res.data))
+        // getRouters().then(res => {
+        //   const sdata = JSON.parse(JSON.stringify(res.data))
+        //   const rdata = JSON.parse(JSON.stringify(res.data))
+          const sdata = []
+          const rdata = []
           const sidebarRoutes = filterAsyncRouter(sdata)
           const rewriteRoutes = filterAsyncRouter(rdata, false, true)
           rewriteRoutes.push({ path: '*', redirect: '/404', hidden: true })
@@ -48,7 +50,7 @@ const permission = {
           commit('SET_DEFAULT_ROUTES', sidebarRoutes)
           commit('SET_TOPBAR_ROUTES', sidebarRoutes)
           resolve(rewriteRoutes)
-        })
+        // })
       })
     }
   }
