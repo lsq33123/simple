@@ -140,7 +140,6 @@ export const constantRoutes = [
   },
   ...customRoutes
 ]
-console.log('router:', constantRoutes)
 export default new Router({
   mode: 'history', // 去掉url中的#
   scrollBehavior: () => ({ y: 0 }),

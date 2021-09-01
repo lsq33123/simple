@@ -93,6 +93,21 @@ module.exports = {
         symbolId: 'icon-[name]'
       })
       .end()
+    config.module
+      .rule('vue')
+      .test(/\.vue$/)
+      .exclude.add(resolve('node_modules'))
+      .end()
+      .use('unit-convert-loader')
+      .loader('unit-convert-loader')
+      .options({
+        UIWidth: 1920,
+        targetUnit: 'rem',
+        // minPixelValue: 1, //可选，默认1。您设置的最小值，所有小于它的值都不会被转换。
+        // unitPercesion: 3,//可选，默认3。转换后保留的小数位数。
+        rem:16,//可选，默认null。html节点的字体大小，targetUnit为rem.
+      })
+      .end()
 
     config
       .when(process.env.NODE_ENV !== 'development',
