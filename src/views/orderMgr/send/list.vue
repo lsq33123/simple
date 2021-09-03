@@ -2,9 +2,8 @@
   <div>
     <div class="toolbar-wrap block-wrap">
       <div style="display:flex;align-items:center">
-      <label class="form-text" >订单号</label>
-          <el-input size="small" placeholder="请输入订单号" class="input-width" />
-
+        <label class="form-text">订单号</label>
+        <el-input size="small" placeholder="请输入订单号" class="input-width" />
       </div>
       <div class="toolbar-btn">
         <el-button size="small" type="primary">查询</el-button>
@@ -14,16 +13,17 @@
 
     <div class=" block-wrap ">
       <div class="flex flex-align-center flex-justify-between table-top-wrap">
-          <el-tabs v-model="activeName" @tab-click="handleClick" class="tab-wrap">
-    <el-tab-pane label="用户管理" name="first"></el-tab-pane>
-    <el-tab-pane label="配置管理" name="second"></el-tab-pane>
-    <el-tab-pane label="角色管理" name="third"></el-tab-pane>
-  </el-tabs>
-  <span>
-
-        <i class="el-icon-setting"></i>
-        <i class="el-icon-refresh-right"></i>
-  </span>
+        <div class="tab-wrap__no-border">
+          <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane label="用户管理" name="first"></el-tab-pane>
+            <el-tab-pane label="配置管理" name="second"></el-tab-pane>
+            <el-tab-pane label="角色管理" name="third"></el-tab-pane>
+          </el-tabs>
+        </div>
+        <span>
+          <i class="el-icon-setting"></i>
+          <i class="el-icon-refresh-right"></i>
+        </span>
       </div>
 
       <TableTemplate style="margin-top:10px" />
@@ -40,7 +40,7 @@ export default {
   props: {},
   data() {
     return {
-      activeName:'first',
+      activeName: "first",
       options: [
         { value: "全部", label: "全部" },
         { value: "其他", label: "其他" }
@@ -116,18 +116,22 @@ export default {
   width: 250px;
 }
 
-.form-text{
-      text-align: right;
-    vertical-align: middle;
-    float: left;
-    font-size: 14px;
-    color: #606266;
-    /* line-height: 2.5rem; */
-    padding: 0 10px 0 0;
-    box-sizing: border-box;
+.form-text {
+  text-align: right;
+  vertical-align: middle;
+  float: left;
+  font-size: 14px;
+  color: #606266;
+  /* line-height: 2.5rem; */
+  padding: 0 10px 0 0;
+  box-sizing: border-box;
 }
 
-    .el-tabs__nav-wrap::after{
-    height: 0;
-  }
+</style>
+
+<style>
+.tab-wrap__no-border .el-tabs__nav-wrap::after {
+  height: 0 !important;
+  bottom: 30px !important;
+}
 </style>
