@@ -104,7 +104,7 @@
     </el-row> -->
     <el-divider />
     <el-row :gutter="20">
-      <el-col :xs="24" :sm="24" :md="12" :lg="8">
+      <!-- <el-col :xs="24" :sm="24" :md="12" :lg="8">
         <el-card class="update-log">
           <div slot="header" class="clearfix">
             <span>联系信息</span>
@@ -578,7 +578,7 @@
             </el-collapse-item>
           </el-collapse>
         </el-card>
-      </el-col>
+      </el-col> -->
       <!-- <el-col :xs="24" :sm="24" :md="12" :lg="8">
         <el-card class="update-log">
           <div slot="header" class="clearfix">

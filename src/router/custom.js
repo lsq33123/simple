@@ -27,13 +27,31 @@ export const customRoutes = [
   {
     path: '/test',
     component: Layout,
-    redirect: 'noredirect',
     children: [
       {
         path: '/test1',
         component: (resolve) => require(['@/views/test/index'], resolve),
         name: 'Test1',
         meta: { title: '测试页面', icon: 'user' }
+      }
+    ]
+  },
+  {
+    path: '/orderMgr',
+    component: Layout,
+    meta: { title: '订单管理',  icon: 'list'},
+    children: [
+      {
+        path: '/orderMgr/orderList',
+        component: (resolve) => require(['@/views/orderMgr/order/list'], resolve),
+        name: 'OrderList',
+        meta: { title: '订单列表', icon: 'build' }
+      },
+      {
+        path: '/orderMgr/sendList',
+        component: (resolve) => require(['@/views/orderMgr/send/list'], resolve),
+        name: 'SendList',
+        meta: { title: '发货管理', icon: 'guide' }
       }
     ]
   },

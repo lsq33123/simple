@@ -11,7 +11,6 @@ NProgress.configure({ showSpinner: false })
 const whiteList = ['/login', '/auth-redirect', '/bind', '/register','/test1','/index']
 
 router.beforeEach((to, from, next) => {
-  debugger
   // NProgress.start()
   // if (getToken()) {
   //   to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
