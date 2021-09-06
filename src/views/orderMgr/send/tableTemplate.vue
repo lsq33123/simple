@@ -69,8 +69,8 @@
             <div v-else-if="col.prop === 'action'" class="flex flex-align-center cell">
               <div style="line-height:30px">
                 <span class="span-btn mg-r-10">详情</span>
-                <!-- <span class="span-btn mg-r-10" @click="isShowRemark = true">备注</span> -->
-                <span class="span-btn mg-r-10">发货</span>
+                <!-- <span class="span-btn mg-r-10" >备注</span> -->
+                <span class="span-btn mg-r-10" @click="isShowSend = true">发货</span>
                 <!-- <span class="span-btn mg-r-10">发起售后</span>
                 <span class="span-btn mg-r-10" @click="isShowHistory = true">操作历史</span> -->
               </div>
@@ -85,17 +85,19 @@
         </div>
       </div>
     </div>
+    <SendDialog :isShow="isShowSend"/>
   </div>
 </template>
 
 <script>
 // import { } from '@/api'
+import SendDialog from './sendDialog.vue'
 export default {
-  components: {},
+  components: {SendDialog},
   props: {},
   data() {
     return {
-      isShowRemark: false,
+      isShowSend: true,
       isShowHistory: false,
       columns: [
         {
