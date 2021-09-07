@@ -375,16 +375,56 @@ export const beautifierConf = {
 }
 
 // 首字母大小
-export function titleCase(str) {
+export const  titleCase = (str) => {
   return str.replace(/( |^)[a-z]/g, L => L.toUpperCase())
 }
 
-// 下划转驼峰
-export function camelCase(str) {
-  return str.replace(/-[a-z]/g, str1 => str1.substr(-1).toUpperCase())
+/**
+ * 字符串下划线转驼峰
+ * @param {String} value 需要转换的值
+ */
+ const  formatToHump = (value) => {
+  return value.replace(/\_(\w)/g, (_, letter) => letter.toUpperCase())
 }
 
-export function isNumberStr(str) {
-  return /^[+-]?(0|([1-9]\d*))(\.\d+)?$/g.test(str)
+/**
+ * 字符串驼峰转下划线
+ * @param {String} value 
+ */
+ const formatToLine = (value) => {
+  return value.replace(/([A-Z])/g,"_$1").toLowerCase()
 }
- 
+
+
+
+/**
+ * 数据对象key 驼峰下划线相互转化
+ * @param {Object} data - 原始对象 支持-数组、key-value对象、字符串
+ * @param {String} type hump-转驼峰  line-转下划线
+ */
+ export const formatHumpLineTransfer = (data, type = 'hump') => {
+  let hump = ''
+  // 转换对象中的每一个键值为驼峰的递归
+  let formatTransferKey = (data) => {
+    if (data instanceof Array) {
+      data.forEach(item => formatTransferKey(item))
+    } else if (data instanceof Object) {
+      for (let key in data) {
+        hump = type === 'hump' ? formatToHump(key) : formatToLine(key)
+        data[hump] = data[key]
+        if (key !== hump) {
+          delete data[key]
+        }
+        if (data[hump] instanceof Object) {
+          formatTransferKey(data[hump])
+        }
+      }
+    } else if (typeof data === 'string') {
+      data = type === 'hump' ? formatToHump(data) : formatToLine(data)
+    }
+  }
+  formatTransferKey(data)
+  return data
+}
+
+

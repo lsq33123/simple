@@ -48,11 +48,30 @@ export const customRoutes = [
         meta: { title: '订单列表', icon: 'build' }
       },
       {
+        path: '/orderMgr/addOrderList',
+        component: (resolve) => require(['@/views/orderMgr/order/add'], resolve),
+        name: 'addOrderList',
+        meta: { title: '创建订单', icon: 'build' }
+      },
+      {
         path: '/orderMgr/sendList',
         component: (resolve) => require(['@/views/orderMgr/send/list'], resolve),
         name: 'SendList',
         meta: { title: '发货管理', icon: 'guide' }
       }
+    ]
+  },
+  {
+    path: '/system',
+    component: Layout,
+    meta: { title: '系统管理',  icon: 'setting'},
+    children: [
+      {
+        path: '/system/menuList',
+        component: (resolve) => require(['@/views/system/menu'], resolve),
+        name: 'MenuList',
+        meta: { title: '菜单列表', icon: 'tree-table' }
+      },
     ]
   },
 ]

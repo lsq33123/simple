@@ -58,3 +58,13 @@ export function delMenu(menuId) {
     method: 'delete'
   })
 }
+
+
+//模板列表数据
+// export const getMenuList = params => request.get('/system/menu/' ,{params})
+//获取菜单列表 list结构
+export const getMenuList = body => request.post('/menu/list/',body)
+
+//新增菜单
+export const addMenuList = body => request.post('/menu/add',body)
+

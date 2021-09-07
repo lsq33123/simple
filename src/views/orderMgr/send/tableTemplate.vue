@@ -68,7 +68,7 @@
 
             <div v-else-if="col.prop === 'action'" class="flex flex-align-center cell">
               <div style="line-height:30px">
-                <span class="span-btn mg-r-10">详情</span>
+                <span class="span-btn mg-r-10"  @click="isShowSendDet = true">详情</span>
                 <!-- <span class="span-btn mg-r-10" >备注</span> -->
                 <span class="span-btn mg-r-10" @click="isShowSend = true">发货</span>
                 <!-- <span class="span-btn mg-r-10">发起售后</span>
@@ -85,20 +85,22 @@
         </div>
       </div>
     </div>
-    <SendDialog :isShow="isShowSend"/>
+    <SendDialog :isShow.sync="isShowSend"/>
+    <SendDetDrawer :isShow.sync="isShowSendDet"/>
   </div>
 </template>
 
 <script>
 // import { } from '@/api'
 import SendDialog from './sendDialog.vue'
+import SendDetDrawer from './sendDetDrawer.vue'
 export default {
-  components: {SendDialog},
+  components: {SendDialog,SendDetDrawer},
   props: {},
   data() {
     return {
-      isShowSend: true,
-      isShowHistory: false,
+      isShowSend: false,
+      isShowSendDet: true,
       columns: [
         {
           label: "商品",

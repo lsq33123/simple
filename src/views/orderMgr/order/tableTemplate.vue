@@ -50,8 +50,8 @@
               </div>
             </div>
             <div v-else-if="col.prop === 'v10'" class="flex flex-align-center cell"></div>
-            <div v-else class="flex flex-align-center cell"></div>
-            <div v-else class="flex flex-align-center cell">
+
+            <div v-else-if="col.prop === 'action'" class="flex flex-align-center cell">
               <div style="line-height:30px">
                 <span class="span-btn mg-r-10">详情</span>
                 <span class="span-btn mg-r-10" @click="isShowRemark = true">备注</span>
@@ -60,6 +60,7 @@
                 <span class="span-btn mg-r-10" @click="isShowHistory = true">操作历史</span>
               </div>
             </div>
+                        <div v-else class="flex flex-align-center cell"></div>
           </div>
         </div>
 
@@ -138,6 +139,7 @@ export default {
         },
         {
           label: "操作",
+          prop: "action",
           width: 100
         }
       ],

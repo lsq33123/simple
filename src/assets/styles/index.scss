@@ -4,6 +4,8 @@
 @import './element-ui.scss';
 @import './sidebar.scss';
 @import './btn.scss';
+@import './flex.scss';
+
 
 body {
   height: 100%;
@@ -31,6 +33,36 @@ html {
 *:after {
   box-sizing: inherit;
 }
+
+//滚动条样式
+::-webkit-scrollbar {
+  width: 10px; //纵向宽度
+  height: 10px; //横向高度
+}
+
+::-webkit-scrollbar-track {
+  //底色
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-corner {
+  //角落箭头区域
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  //滚动条颜色
+  background-color: #ccc;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #ddd
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: #ccc
+}
+
 
 .no-padding {
   padding: 0px !important;
