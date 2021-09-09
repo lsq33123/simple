@@ -51,3 +51,8 @@ export function getCodeImg() {
 	timeout: 20000
   })
 }
+
+//获取短信验证码
+export const sendSmsCode = body => request.post('/login/sendSmsCode',  body )
+//短信验证码登录
+export const getVerifySmsCode = body => request.post('/login/verifySmsCode',  body )

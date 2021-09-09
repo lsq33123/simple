@@ -79,14 +79,6 @@ export default {
   font-size: 15px;
 }
 
-.span-btn {
-  color: #1890ff;
-  &:hover {
-    color: #46a6ff;
-    cursor: pointer;
-  }
-}
-.mg-l-20{
-  margin-left:20px;
-}
+
+
 </style>

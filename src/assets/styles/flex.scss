@@ -1,11 +1,9 @@
 
 .flex-c{
-  width:100%;
   display: flex;
   align-items: center;
 }
 .flex-cc{
-  width:100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,7 +11,6 @@
 
 
 .flex{
-  width:100%;
   display:flex;
   &-wrap{
     flex-wrap: wrap;
@@ -25,9 +22,6 @@
 
   &-top{
     align-items: flex-start;
-  }
-  &-center{
-    align-items: center;
   }
   &-bottom{
     align-items: flex-end;
@@ -46,6 +40,9 @@
   }
   &-justify-between{
     justify-content: space-between;
+  }
+  &-justify-end {
+    justify-content: flex-end;
   }
   &-justify-around{
     justify-content: space-around;

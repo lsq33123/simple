@@ -100,7 +100,7 @@ export default {
   data() {
     return {
       isShowSend: false,
-      isShowSendDet: true,
+      isShowSendDet: false,
       columns: [
         {
           label: "商品",

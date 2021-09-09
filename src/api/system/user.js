@@ -142,3 +142,13 @@ export function updateAuthRole(data) {
     params: data
   })
 }
+
+
+//获取用户
+export const getMenuList = body => request.post('/admin_user/list', body)
+//新增用户
+export const addMenuList = body => request.post('/admin_user/create',  body )
+//修改用户
+export const updateMenuList = body => request.post('/admin_user/edit',  body )
+//状态修改
+export const updateMenuListStatus = body => request.post('/admin_user/update_status',  body )

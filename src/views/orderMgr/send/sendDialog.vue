@@ -3,7 +3,15 @@
     <el-dialog :visible="isShow" title="发货" width="700px" :before-close="onClose">
       <el-form label-width="100px">
         <el-form-item label="OBD序列号" required>
-          <el-input placeholder="请输入" class="input-width" />
+          <el-input placeholder="请输入" class="w350" />
+                      <div class="mark-icon-wrap">
+              <svg-icon icon-class="check" class-name="check-panel-icon" />
+              已注册
+              </div>
+              <div class="mark-icon-wrap">
+              <svg-icon icon-class="check" class-name="check-panel-icon" />
+              首购
+              </div>
         </el-form-item>
         <el-form-item label="发货方式" required>
           <el-radio-group v-model="radio">
@@ -18,10 +26,10 @@
           <el-input placeholder="请输入" style="width:400px" />
         </el-form-item>
         <el-form-item label="发货时间" required>
-          <el-date-picker v-model="value1" type="date" placeholder="选择日期" class="input-width" /> 
+          <el-date-picker v-model="value1" type="date" placeholder="选择日期" class="w350" /> 
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" placeholder="请输入" v-model="textarea2" class="input-width" />
+          <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" placeholder="请输入" v-model="textarea2" class="w350" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -74,4 +82,18 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+.mark-icon-wrap{
+  display: inline-block;
+  // line-height: unset;
+  // align-items: center;
+  // height: 36px;
+.check-panel-icon{
+  fill: red;
+  font-size: 20px;
+  margin-left:18px;
+}
+}
+
+</style>

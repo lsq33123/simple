@@ -18,10 +18,16 @@
                   </div>
                 </template>
               </el-table-column>
-              <el-table-column label="销售价（元）" min-width="100"> </el-table-column>
               <el-table-column label="库存" min-width="100"> </el-table-column>
+              <el-table-column label="销售价(元)" min-width="100"> </el-table-column>
 
-              <el-table-column label="商品数量" width="200">
+              <el-table-column label="实收金额(元)" min-width="150">
+                <template slot-scope="scoped">
+                  <el-input />
+                </template>
+              </el-table-column>
+
+              <el-table-column label="商品数量" min-width="150">
                 <template slot-scope="scoped">
                   <el-input />
                 </template>
@@ -52,7 +58,15 @@
             </el-form-item>
             <el-form-item label="手机号" required>
               <el-select></el-select>
-              <el-input placeholder="请输入" style="width:400px" />
+              <el-input placeholder="请输入手机号" class="w300" />
+              <div class="mark-icon-wrap">
+              <svg-icon icon-class="check" class-name="check-panel-icon" />
+              已注册
+              </div>
+              <div class="mark-icon-wrap">
+              <svg-icon icon-class="check" class-name="check-panel-icon" />
+              首购
+              </div>
             </el-form-item>
             <el-form-item label="姓名" required>
               <el-select></el-select>
@@ -90,7 +104,7 @@
 
           <el-card class="box-card">
             <div slot="header" class="clearfix">
-              <span>金额信息</span>
+              <span>收款信息</span>
             </div>
             <el-row>
               <el-col :span="8">
@@ -115,7 +129,8 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="收款情况" required>
-                  <el-select></el-select>
+                  <el-select class="w200"></el-select>
+                  <el-select class="w200"></el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -140,14 +155,14 @@
 
       </div>
     </div>
-    <div class="right-wrap ">
+    <!-- <div class="right-wrap ">
       <el-tabs tab-position="right" style="height: 200px;position: absolute;">
         <el-tab-pane label="商品信息"></el-tab-pane>
         <el-tab-pane label="买家信息"></el-tab-pane>
         <el-tab-pane label="收货信息"></el-tab-pane>
         <el-tab-pane label="金额信息"></el-tab-pane>
       </el-tabs>
-    </div>
+    </div> -->
     <div class="bottom-bar-wrap flex-cc">
       <el-button type="primary" size="small" style="width:200px">提  交</el-button>
     </div>
@@ -193,9 +208,7 @@ export default {
 
 <style lang="scss" scoped>
 .container-wrap{
-  display:flex;
-    position: relative;
-    height: calc(100% - 50px);
+  padding-bottom: 50px;
 }
 
 .block-wrap {
@@ -208,7 +221,8 @@ export default {
 
 
 .left-wrap {
-  width: calc(100% - 200px);
+  // width: calc(100% - 200px);
+  width: 100%;
   display: inline-block;
 
 }
@@ -237,17 +251,26 @@ export default {
     color: #909399;
   }
 }
+.mark-icon-wrap{
+  display: inline-block;
+  // line-height: unset;
+  // align-items: center;
+  // height: 36px;
+.check-panel-icon{
+  fill: red;
+  font-size: 20px;
+  margin-left:18px;
+}
+}
 
 
 .bottom-bar-wrap{
-  width: calc(100% - 240px);
+  width: 100%;
   height: 50px;
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
-  padding:10px 20px;
-  margin: 0px 20px;
+  right: 0;
   background: #fff;
-  border-radius:4px;
 }
 </style>

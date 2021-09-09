@@ -5,6 +5,8 @@
 @import './sidebar.scss';
 @import './btn.scss';
 @import './flex.scss';
+@import './custom.scss';
+@import './short.scss';
 
 
 body {
@@ -89,33 +91,6 @@ div:focus {
   outline: none;
 }
 
-.fr {
-  float: right;
-}
-
-.fl {
-  float: left;
-}
-
-.pr-5 {
-  padding-right: 5px;
-}
-
-.pl-5 {
-  padding-left: 5px;
-}
-
-.block {
-  display: block;
-}
-
-.pointer {
-  cursor: pointer;
-}
-
-.inlineBlock {
-  display: block;
-}
 
 .clearfix {
   &:after {

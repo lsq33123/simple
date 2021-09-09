@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-drawer title="操作记录" :visible="isShow" direction="rtl" :before-close="onClose">
+    <el-drawer title="操作历史" :visible="isShow" direction="rtl" :before-close="onClose">
       <div class="order-info-wrap"><span>订单号：</span>Y20210124160923898909</div>
       <div style="padding-right:20px">
         <el-timeline>
@@ -24,7 +24,7 @@
           </el-timeline-item>
      
           <el-timeline-item >
-          <p class="el-timeline-item-title">修改订单 <span class="span-btn mg-l-20">详情</span></p>
+          <p class="el-timeline-item-title">修改订单 <span class="text-btn ml20">详情</span></p>
             <el-card>
               <h4>xuanzhi.zeng</h4>
               <p>2018/4/12 20:46</p>
@@ -32,7 +32,7 @@
           </el-timeline-item>
      
           <el-timeline-item >
-          <p class="el-timeline-item-title">创建订单 <span class="span-btn mg-l-20">详情</span></p>
+          <p class="el-timeline-item-title">创建订单 <span class="text-btn ml20">详情</span></p>
             <el-card>
               <h4>xuanzhi.zeng</h4>
               <p>2018/4/12 20:46</p>
@@ -82,16 +82,5 @@ export default {
 .el-timeline-item-title{
   font-weight: bold;
   font-size: 15px;
-}
-
-.span-btn {
-  color: #1890ff;
-  &:hover {
-    color: #46a6ff;
-    cursor: pointer;
-  }
-}
-.mg-l-20{
-  margin-left:20px;
 }
 </style>

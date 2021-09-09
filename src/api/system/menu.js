@@ -1,16 +1,8 @@
 import request from '@/utils/request'
 
-// 查询菜单列表
-export function listMenu(query) {
-  return request({
-    url: '/system/menu/list',
-    method: 'get',
-    params: query
-  })
-}
 
 // 查询菜单详细
-export function getMenu(menuId) {
+export function getMenu (menuId) {
   return request({
     url: '/system/menu/' + menuId,
     method: 'get'
@@ -18,7 +10,7 @@ export function getMenu(menuId) {
 }
 
 // 查询菜单下拉树结构
-export function treeselect() {
+export function treeselect () {
   return request({
     url: '/system/menu/treeselect',
     method: 'get'
@@ -26,45 +18,21 @@ export function treeselect() {
 }
 
 // 根据角色ID查询菜单下拉树结构
-export function roleMenuTreeselect(roleId) {
+export function roleMenuTreeselect (roleId) {
   return request({
     url: '/system/menu/roleMenuTreeselect/' + roleId,
     method: 'get'
   })
 }
 
-// 新增菜单
-export function addMenu(data) {
-  return request({
-    url: '/system/menu',
-    method: 'post',
-    data: data
-  })
-}
-
-// 修改菜单
-export function updateMenu(data) {
-  return request({
-    url: '/system/menu',
-    method: 'put',
-    data: data
-  })
-}
-
-// 删除菜单
-export function delMenu(menuId) {
-  return request({
-    url: '/system/menu/' + menuId,
-    method: 'delete'
-  })
-}
-
-
 //模板列表数据
 // export const getMenuList = params => request.get('/system/menu/' ,{params})
 //获取菜单列表 list结构
-export const getMenuList = body => request.post('/menu/list/',body)
-
+export const getMenuList = body => request.post('/menu/list/', body)
 //新增菜单
-export const addMenuList = body => request.post('/menu/add',body)
+export const addMenuList = body => request.post('/menu/add', body)
+//修改菜单
+export const updateMenuList = body => request.post('/menu/update', body)
+//删除菜单
+export const delMenuList = body => request.post('/menu/delete', body)
 

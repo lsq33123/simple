@@ -58,7 +58,6 @@
 
 <script>
 import { getCodeImg } from "@/api/login";
-import { sendSmsCode } from "@/api/login";
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
@@ -106,7 +105,7 @@ export default {
   },
   methods: {
     getCode() {
-      sendSmsCode().then(res => {
+      getCodeImg().then(res => {
         this.captchaOnOff = res.captchaOnOff === undefined ? true : res.captchaOnOff;
         if (this.captchaOnOff) {
           this.codeUrl = "data:image/gif;base64," + res.img;

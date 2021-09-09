@@ -2,10 +2,10 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch">
       <el-form-item label="菜单名称" prop="menuName">
-        <el-input v-model="queryParams.menuName" placeholder="请输入菜单名称" clearable size="small" @keyup.enter.native="handleQuery" />
+        <el-input v-model="queryParams.name" placeholder="请输入菜单名称" clearable size="small" @keyup.enter.native="handleQuery" />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select v-model="queryParams.status" placeholder="菜单状态" clearable size="small">
+        <el-select v-model="queryParams.state" placeholder="菜单状态" clearable size="small">
           <el-option v-for="dict in statusOptions" :key="dict.dictValue" :label="dict.dictLabel" :value="dict.dictValue" />
         </el-select>
       </el-form-item>
@@ -30,7 +30,11 @@
         </template>
       </el-table-column>
       <el-table-column prop="orderNum" label="排序" width="60"></el-table-column>
-      <el-table-column prop="perms" label="权限标识" :show-overflow-tooltip="true"></el-table-column>
+      <el-table-column prop="perms" label="权限标识" :show-overflow-tooltip="true">
+        <template slot-scope="scope">
+          {{scope.row.menuType == 4 ? scope.row.apiPath : scope.row.perms}}
+        </template>
+      </el-table-column>
       <el-table-column prop="component" label="组件路径" :show-overflow-tooltip="true"></el-table-column>
       <el-table-column prop="status" label="状态" :formatter="statusFormat" width="80"></el-table-column>
       <el-table-column label="创建时间" align="center" prop="createTime">
@@ -40,16 +44,16 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" v-hasPermi="['system:menu:edit']">修改</el-button>
-          <el-button size="mini" type="text" icon="el-icon-plus" @click="handleAdd(scope.row)" v-hasPermi="['system:menu:add']">新增</el-button>
-          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" v-hasPermi="['system:menu:remove']">删除</el-button>
+          <el-button size="mini" type="text" icon="el-icon-edit" @click="handleUpdate(scope.row)" >修改</el-button>
+          <el-button size="mini" type="text" icon="el-icon-plus" @click="handleAdd(scope.row)" >新增</el-button>
+          <el-button size="mini" type="text" icon="el-icon-delete" @click="handleDelete(scope.row)" >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 添加或修改菜单对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="680px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+    <el-dialog :title="title" :visible.sync="open" width="750px" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-row>
           <el-col :span="24">
             <el-form-item label="上级菜单">
@@ -124,13 +128,24 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item v-if="form.menuType != 1">
+            <el-form-item v-if="form.menuType != 1 && form.menuType != 4">
               <el-input v-model="form.perms" placeholder="请输入权限标识" maxlength="100" />
               <span slot="label">
                 <el-tooltip content="控制器中定义的权限字符，如：@PreAuthorize(`@ss.hasPermi('system:user:list')`)" placement="top">
                   <i class="el-icon-question"></i>
                 </el-tooltip>
                 权限字符
+              </span>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="form.menuType == 4">
+              <el-input v-model="form.apiPath" placeholder="请输入权限地址" maxlength="200" />
+              <span slot="label">
+                <el-tooltip content="接口地址" placement="top">
+                  <i class="el-icon-question"></i>
+                </el-tooltip>
+                权限地址
               </span>
             </el-form-item>
           </el-col>
@@ -174,6 +189,16 @@
               </el-radio-group>
             </el-form-item>
           </el-col>
+
+                   <el-col :span="12">
+            <el-form-item v-if="form.menuType != 1">
+              <el-input v-model="form.remark" placeholder="请输入备注" maxlength="200" />
+              <span slot="label">
+                备注
+              </span>
+            </el-form-item>
+          </el-col>
+
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -185,9 +210,7 @@
 </template>
 
 <script>
-import { listMenu, getMenu, delMenu, addMenu, updateMenu } from "@/api/system/menu";
-import { getMenuList, addMenuList } from "@/api/system/menu";
-import { formatHumpLineTransfer } from "@/utils";
+import { getMenuList, addMenuList,delMenuList,updateMenuList } from "@/api/system/menu";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import IconSelect from "@/components/IconSelect";
@@ -221,8 +244,8 @@ export default {
       ],
       // 查询参数
       queryParams: {
-        menuName: undefined,
-        visible: undefined
+        name: undefined,
+        state: undefined
       },
       // 表单参数
       form: {},
@@ -288,7 +311,7 @@ export default {
       if (row.menuType == "3") {
         return "";
       }
-      return row.status ? "禁用" : "启用";
+      return row.status ? "启用" : "禁用";
     },
     // 取消按钮
     cancel() {
@@ -336,27 +359,40 @@ export default {
     handleUpdate(row) {
       this.reset();
       this.getTreeselect();
-      getMenu(row.menuId).then(response => {
-        this.form = response.data;
+        this.form = {...row}
         this.open = true;
         this.title = "修改菜单";
-      });
     },
+
     /** 提交按钮 */
     submitForm: function() {
       this.$refs["form"].validate(valid => {
         if (valid) {
+          let params = {
+              id:this.form.menuId || '',
+              pid: this.form.parentId,
+              name: this.form.menuName,
+              sort: this.form.orderNum,
+              url_path: this.form.path,
+              api_path: this.form.apiPath,
+              component: this.form.component,
+              is_frame: this.form.isFrame,
+              is_cache: this.form.isCache,
+              type: this.form.menuType,
+              visible: this.form.visible,
+              state: this.form.status,
+              perms: this.form.perms,
+              icon: this.form.icon,
+              remark: this.form.remark
+            }
           if (this.form.menuId != undefined) {
-            updateMenu(this.form).then(response => {
+            updateMenuList(params).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            const params = formatHumpLineTransfer(this.form,'line')
-            debugger
             addMenuList(params).then(response => {
-              debugger
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -373,7 +409,7 @@ export default {
         type: "warning"
       })
         .then(function() {
-          return delMenu(row.menuId);
+          return delMenuList({id:row.menuId});
         })
         .then(() => {
           this.getList();

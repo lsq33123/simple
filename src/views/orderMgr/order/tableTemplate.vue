@@ -11,7 +11,7 @@
         <div class="title-info">
           <span>
             订单号：{{ item.orderNo }}
-            <span class="span-btn">复制</span>
+            <span class="text-btn">复制</span>
           </span>
           <span>下单时间：{{ item.date }}</span>
           <span>订单来源：{{ item.source }}</span>
@@ -23,13 +23,7 @@
               <span class="color-blue mg-l-10">{{ item.name }}</span>
             </div>
             <div v-else-if="col.prop === 'v2'" class="flex flex-align-center cell">
-              <el-tag type="success">正常</el-tag>
-            </div>
-            <div v-else-if="col.prop === 'v3'" class="flex flex-align-center cell">
-              <el-tag type="success">已支付</el-tag>
-            </div>
-            <div v-else-if="col.prop === 'v4'" class="flex flex-align-center cell">
-              <el-tag type="warning">待发货</el-tag>
+              <el-tag type="success">待发货</el-tag>
             </div>
             <div v-else-if="col.prop === 'v5'" class="flex flex-align-center cell">
               {{ item.price }}
@@ -45,7 +39,7 @@
             </div>
             <div v-else-if="col.prop === 'v9'" class="flex flex-align-center cell">
               <div>
-                <p>{{ item.custom }}({{ item.phone }})</p>
+                <p>{{ item.custom }}  {{ item.phone }}</p>
                 <p>{{ item.address }}</p>
               </div>
             </div>
@@ -53,11 +47,11 @@
 
             <div v-else-if="col.prop === 'action'" class="flex flex-align-center cell">
               <div style="line-height:30px">
-                <span class="span-btn mg-r-10">详情</span>
-                <span class="span-btn mg-r-10" @click="isShowRemark = true">备注</span>
-                <span class="span-btn mg-r-10">发货</span>
-                <span class="span-btn mg-r-10">发起售后</span>
-                <span class="span-btn mg-r-10" @click="isShowHistory = true">操作历史</span>
+                <span class="text-btn mg-r-10">详情</span>
+                <span class="text-btn mg-r-10" @click="isShowRemark = true">备注</span>
+                <span class="text-btn mg-r-10">发货</span>
+                <span class="text-btn mg-r-10">发起售后</span>
+                <span class="text-btn mg-r-10" @click="isShowHistory = true">操作历史</span>
               </div>
             </div>
                         <div v-else class="flex flex-align-center cell"></div>
@@ -97,16 +91,7 @@ export default {
           prop: "v2",
           width: 100
         },
-        {
-          label: "付款状态",
-          prop: "v3",
-          width: 100
-        },
-        {
-          label: "发货状态",
-          prop: "v4",
-          width: 100
-        },
+
         {
           label: "单价（元）",
           prop: "v5",
@@ -281,13 +266,6 @@ export default {
   }
 }
 
-.flex {
-  display: flex;
-  &-align-center {
-    align-items: center;
-  }
-}
-
 .color-blue {
   color: #1890ff;
 }
@@ -297,13 +275,5 @@ export default {
 }
 .mg-r-10 {
   margin-right: 10px;
-}
-
-.span-btn {
-  color: #1890ff;
-  &:hover {
-    color: #46a6ff;
-    cursor: pointer;
-  }
 }
 </style>
