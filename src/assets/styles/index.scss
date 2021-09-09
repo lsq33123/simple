@@ -137,7 +137,10 @@ aside {
 }
 
 .pagination-container {
-  margin-top: 30px;
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .text-center {

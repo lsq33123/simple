@@ -86,7 +86,7 @@
           </el-table-column>
         </el-table>
 
-        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.pageNum" :limit.sync="queryParams.pageSize" @pagination="getList" />
+        <pagination v-show="total > 0" :total="total" :page.sync="queryParams.page" :limit.sync="queryParams.page_size" @pagination="getList" />
       </el-col>
     </el-row>
 
@@ -277,9 +277,9 @@ export default {
       },
       // 查询参数
       queryParams: {
-        pageNum: 1,
-        page: 20,
-        keywords: '',
+        page: 1,
+        page_size: 20,
+        keywords: undefined,
       },
       // 列信息
       columns: [
@@ -391,7 +391,7 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery() {
-      this.queryParams.pageNum = 1;
+      this.queryParams.page = 1;
       this.getList();
     },
 

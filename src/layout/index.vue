@@ -7,7 +7,7 @@
         <navbar />
         <tags-view v-if="needTagsView" />
       </div>
-      <app-main  class="main-bg"/>
+      <app-main />
       <right-panel>
         <settings />
       </right-panel>
@@ -103,8 +103,5 @@ export default {
 
   .mobile .fixed-header {
     width: 100%;
-  }
-  .main-bg{
-    background: #f1f3f7;
   }
 </style>

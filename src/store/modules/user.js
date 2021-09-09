@@ -1,4 +1,6 @@
 import { login, logout, getInfo } from '@/api/login'
+import { getVerifySmsCode } from '@/api/login'
+
 import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const user = {
@@ -34,11 +36,11 @@ const user = {
       const username = userInfo.username.trim()
       const password = userInfo.password
       const code = userInfo.code
-      const uuid = userInfo.uuid
       return new Promise((resolve, reject) => {
-        login(username, password, code, uuid).then(res => {
-          setToken(res.token)
-          commit('SET_TOKEN', res.token)
+        getVerifySmsCode({ mobile: username, code: code }).then(res => {
+
+          setToken(res.result.token)
+          commit('SET_TOKEN', res.result.token)
           resolve()
         }).catch(error => {
           reject(error)
@@ -70,15 +72,15 @@ const user = {
     // 退出系统
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        // logout(state.token).then(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           commit('SET_PERMISSIONS', [])
           removeToken()
           resolve()
-        }).catch(error => {
-          reject(error)
-        })
+        // }).catch(error => {
+        //   reject(error)
+        // })
       })
     },
 

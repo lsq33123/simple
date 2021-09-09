@@ -17,7 +17,7 @@ service.interceptors.request.use(config => {
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
   if (getToken() && !isToken) {
-    config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    config.headers['x-access-token'] =  getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
   // get请求映射params参数
   if (config.method === 'get' && config.params) {
@@ -59,7 +59,7 @@ service.interceptors.response.use(res => {
   const code = res.data.errcode || 0;
   // 获取错误信息
   const msg = errorCode[code] || res.data.errmsg || errorCode['default']
-  if (code === 401) {
+  if (code === 200) {
     MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
       confirmButtonText: '重新登录',
       cancelButtonText: '取消',

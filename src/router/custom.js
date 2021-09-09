@@ -23,19 +23,6 @@ import Layout from '@/layout'
 
 // 公共路由
 export const customRoutes = [
-
-  {
-    path: '/test',
-    component: Layout,
-    children: [
-      {
-        path: '/test1',
-        component: (resolve) => require(['@/views/test/index'], resolve),
-        name: 'Test1',
-        meta: { title: '测试页面', icon: 'user' }
-      }
-    ]
-  },
   {
     path: '/orderMgr',
     component: Layout,
