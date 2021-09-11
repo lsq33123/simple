@@ -10,51 +10,57 @@
       <div v-for="(item, index) in tableData" :key="index" class="body-item-wrap">
         <div class="title-info">
           <span>
-            订单号：{{ item.orderNo }}
+            订单号：{{ item.order_sn }}
             <span class="text-btn">复制</span>
           </span>
-          <span>下单时间：{{ item.date }}</span>
-          <span>订单来源：{{ item.source }}</span>
+          <span>下单时间：{{ item.create_time }}</span>
+          <span>订单来源：{{ item.order_type_name }}</span>
         </div>
         <div class="row-info flex">
           <div v-for="(col, cIndex) in columns" :key="cIndex" class="row-info-item" :style="{ 'min-width': col.width + 'px' }">
-            <div v-if="col.prop === 'v1'" class="flex flex-align-center cell">
-              <img :src="item.img" />
-              <span class="color-blue mg-l-10">{{ item.name }}</span>
-            </div>
-            <div v-else-if="col.prop === 'v2'" class="flex flex-align-center cell">
-              <el-tag type="success">待发货</el-tag>
-            </div>
-            <div v-else-if="col.prop === 'v5'" class="flex flex-align-center cell">
-              {{ item.price }}
-            </div>
-            <div v-else-if="col.prop === 'v6'" class="flex flex-align-center cell">
-              {{ item.num }}
-            </div>
-            <div v-else-if="col.prop === 'v7'" class="flex flex-align-center cell">
-              <span style="font-weight:bold;color:red"> {{ item.total }}</span>
-            </div>
-            <div v-else-if="col.prop === 'v8'" class="flex flex-align-center cell">
-              <span class="color-blue"> {{ item.phone }}</span>
-            </div>
-            <div v-else-if="col.prop === 'v9'" class="flex flex-align-center cell">
-              <div>
-                <p>{{ item.custom }}  {{ item.phone }}</p>
-                <p>{{ item.address }}</p>
+            <div v-if="col.prop === 'goods_name'" class="row-info-item-prop">
+              <div class="flex flex-align-center con-cell" v-for="(good, gindex) in item.order_goods" :key="gindex">
+                <img :src="good.goods_pic" />
+                <span class="color-blue ml10">{{ good.goods_name }}</span>
               </div>
             </div>
-            <div v-else-if="col.prop === 'v10'" class="flex flex-align-center cell"></div>
+            <div v-else-if="col.prop === 'order_status_name'" class="flex flex-align-center con-cell row-info-item-prop">
+              <el-tag type="success">{{ item.order_status_name }}</el-tag>
+            </div>
+            <div v-else-if="col.prop === 'v5'" class="row-info-item-prop">
+              <div class="flex flex-align-center con-cell" v-for="(good, gindex) in item.order_goods" :key="gindex">
+                {{ good.price }}
+              </div>
+            </div>
+            <div v-else-if="col.prop === 'v6'" class="row-info-item-prop">
+              <div class="flex flex-align-center con-cell" v-for="(good, gindex) in item.order_goods" :key="gindex">
+                {{ good.count }}
+              </div>
+            </div>
+            <div v-else-if="col.prop === 'payment_money'" class="flex flex-align-center con-cell row-info-item-prop">
+              <span style="font-weight:bold;color:red"> {{ item.payment_money }}</span>
+            </div>
+            <div v-else-if="col.prop === 'buyer_phone'" class="flex flex-align-center con-cell row-info-item-prop">
+              <span class="color-blue"> {{ item.buyer_phone }}</span>
+            </div>
+            <div v-else-if="col.prop === 'v9'" class="flex flex-align-center con-cell row-info-item-prop">
+              <div v-if="item.order_logistics_info">
+                <p>{{ item.order_logistics_info.receive_name || "" }} {{ item.order_logistics_info.receive_phone || "" }}</p>
+                <p>{{ `${item.order_logistics_info.receive_area || ""} ${item.order_logistics_info.receive_address || ""}` }}</p>
+              </div>
+            </div>
+            <div v-else-if="col.prop === 'v10'" class="flex flex-align-center con-cell row-info-item-prop"></div>
 
-            <div v-else-if="col.prop === 'action'" class="flex flex-align-center cell">
+            <div v-else-if="col.prop === 'action'" class="flex flex-align-center con-cell row-info-item-prop">
               <div style="line-height:30px">
-                <span class="text-btn mg-r-10">详情</span>
-                <span class="text-btn mg-r-10" @click="isShowRemark = true">备注</span>
-                <span class="text-btn mg-r-10">发货</span>
-                <span class="text-btn mg-r-10">发起售后</span>
-                <span class="text-btn mg-r-10" @click="isShowHistory = true">操作历史</span>
+                <span class="text-btn mr10">详情</span>
+                <span class="text-btn mr10" @click="isShowRemark = true">备注</span>
+                <span class="text-btn mr10">发货</span>
+                <span class="text-btn mr10">发起售后</span>
+                <span class="text-btn mr10" @click="isShowHistory = true">操作历史</span>
               </div>
             </div>
-                        <div v-else class="flex flex-align-center cell"></div>
+            <div v-else class="flex flex-align-center con-cell row-info-item-prop"></div>
           </div>
         </div>
 
@@ -70,25 +76,29 @@
 </template>
 
 <script>
-// import { } from '@/api'
-import RemarkDialog from './remarkDialog.vue'
-import HistoryDrawer from './historyDrawer.vue'
+import RemarkDialog from "./remarkDialog.vue"
+import HistoryDrawer from "./historyDrawer.vue"
 export default {
-  components: {RemarkDialog ,HistoryDrawer},
-  props: {},
+  components: { RemarkDialog, HistoryDrawer },
+  props: {
+    tableData: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
-      isShowRemark:false,
-      isShowHistory:false,
+      isShowRemark: false,
+      isShowHistory: false,
       columns: [
         {
           label: "商品",
-          prop: "v1",
+          prop: "goods_name",
           width: 200
         },
         {
           label: "订单状态",
-          prop: "v2",
+          prop: "order_status_name",
           width: 100
         },
 
@@ -104,12 +114,12 @@ export default {
         },
         {
           label: "实收（元）",
-          prop: "v7",
+          prop: "payment_money",
           width: 100
         },
         {
           label: "买家",
-          prop: "v8",
+          prop: "buyer_phone",
           width: 100
         },
         {
@@ -127,68 +137,15 @@ export default {
           prop: "action",
           width: 100
         }
-      ],
-      tableData: [
-        {
-          orderNo: "Y20210124160923898909",
-          date: "2021-9-2 14:48:48",
-          source: "系统销售",
-          img: "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/1/25/1612c45bb3e03f39~tplv-t2oaga2asx-zoom-crop-mark:1304:1304:1304:734.awebp",
-          name: "商家增加版套餐",
-          orderStatus: 1,
-          payStatus: 1,
-          sendStatus: 1,
-          price: 688.0,
-          num: 1,
-          total: 688.0,
-          custom: "周杰伦",
-          phone: "15612341234",
-          address: "四川省绵阳市培城区板桥街快乐购超市"
-        },
-        {
-          orderNo: "Y20210124160923898909",
-          date: "2021-9-2 14:48:48",
-          source: "系统销售",
-          img: "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/1/25/1612c45bb3e03f39~tplv-t2oaga2asx-zoom-crop-mark:1304:1304:1304:734.awebp",
-          name: "商家增加版套餐",
-          orderStatus: 1,
-          payStatus: 1,
-          sendStatus: 1,
-          price: 688.0,
-          num: 1,
-          total: 688.0,
-          custom: "周杰伦",
-          phone: "15612341234",
-          address: "四川省绵阳市培城区板桥街快乐购超市",
-          salerRemark: "微信改装客户群"
-        },
-        {
-          orderNo: "Y20210124160923898909",
-          date: "2021-9-2 14:48:48",
-          source: "系统销售",
-          img: "https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2018/1/25/1612c45bb3e03f39~tplv-t2oaga2asx-zoom-crop-mark:1304:1304:1304:734.awebp",
-          name: "商家增加版套餐",
-          orderStatus: 1,
-          payStatus: 1,
-          sendStatus: 1,
-          price: 688.0,
-          num: 1,
-          total: 688.0,
-          custom: "周杰伦",
-          phone: "15612341234",
-          address: "四川省绵阳市培城区板桥街快乐购超市",
-          salerRemark: "微信改装客户群",
-          customRemark: "别寄寄错了"
-        }
       ]
-    };
+    }
   },
   computed: {},
   watch: {},
   created() {},
   mounted() {},
   methods: {}
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -204,7 +161,7 @@ export default {
     &:first-child {
       padding-left: 10px;
     }
-    padding: 0px 5px;
+    padding: 0px 10px;
     flex: 1;
     font-weight: bold;
     background-color: #f8f8f9;
@@ -244,7 +201,7 @@ export default {
     }
 
     .row-info {
-      padding: 5px 0px;
+      // padding: 5px 0px;
       border: 1px solid #dfe6ec;
       border-top: 0px;
 
@@ -252,10 +209,15 @@ export default {
         display: flex;
         align-items: center;
         flex: 1;
-        padding: 0px 5px;
+        // padding: 0px 5px;
+        border-right: 1px solid  #dfe6ec;
         img {
           width: 70px;
           height: 70px;
+        }
+        &-prop{
+          width: 100%;
+          
         }
       }
     }
@@ -270,10 +232,13 @@ export default {
   color: #1890ff;
 }
 
-.mg-l-10 {
-  margin-left: 10px;
+.con-cell{
+  height: 80px;
+  width: 100%;
+  padding: 0px 10px ;
 }
-.mg-r-10 {
-  margin-right: 10px;
+
+.con-cell + .con-cell{
+  border-top:1px solid  #dfe6ec;
 }
 </style>

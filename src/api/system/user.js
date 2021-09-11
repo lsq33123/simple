@@ -145,10 +145,10 @@ export function updateAuthRole(data) {
 
 
 //获取用户
-export const getMenuList = body => request.post('/adminUser/list', body)
+export const getUserList = body => request.post('/adminUser/list', body)
 //新增用户
-export const addMenuList = body => request.post('/adminUser/create',  body )
+export const addUserList = body => request.post('/adminUser/create',  body )
 //修改用户
-export const updateMenuList = body => request.post('/adminUser/edit',  body )
+export const updateUserList = body => request.post('/adminUser/edit',  body )
 //状态修改
-export const updateMenuListStatus = body => request.post('/adminUser/updateStatus',  body )
+export const updateUserListStatus = body => request.post('/adminUser/updateStatus',  body )

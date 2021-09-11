@@ -99,7 +99,7 @@ export default {
   props: {},
   data() {
     return {
-      isShowSend: false,
+      isShowSend: true,
       isShowSendDet: false,
       columns: [
         {

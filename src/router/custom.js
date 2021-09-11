@@ -71,6 +71,12 @@ export const customRoutes = [
         name: 'UserList',
         meta: { title: '用户列表', icon: 'user' }
       },
+      {
+        path: '/system/icon',
+        component: (resolve) => require(['@/views/components/icons'], resolve),
+        name: 'icon',
+        meta: { title: '图标库', icon: 'star' }
+      },
     ]
   },
 ]

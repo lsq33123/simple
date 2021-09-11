@@ -85,13 +85,13 @@
               </el-col>
               <el-col :span="16">
                 <el-form-item label="手机号" required>
-                  <el-select></el-select>
+                  <SelPhoneCode />
                   <el-input placeholder="请输入" style="width:400px" />
                 </el-form-item>
               </el-col>
               <el-col :span="8">
                 <el-form-item label="收货地址" required>
-                  <el-select></el-select>
+                  <SelAddress />
                 </el-form-item>
               </el-col>
               <el-col :span="16">
@@ -172,9 +172,10 @@
 
 <script>
 // import { } from '@/api'
-import Sticky from '@/components/Sticky'
+import SelPhoneCode from '@/components/SelectInput/selPhoneCode'
+import SelAddress from '@/components/SelectInput/selAddress'
 export default {
-  components: {Sticky},
+  components: {SelPhoneCode,SelAddress},
   props: {},
   data() {
     return {

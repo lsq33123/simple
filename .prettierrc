@@ -1,3 +1,5 @@
 {
-  "printWidth": 200
+  "printWidth": 200,
+  "semi": false,                         // 格式化不加分号
+  "singleQuote": true                // 格式化以单引号为主
 }

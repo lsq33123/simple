@@ -5,42 +5,38 @@
         <el-row>
           <el-col :span="7">
             <el-form-item label="订单号">
-              <el-input size="small" placeholder="请输入订单号" class="w250" />
+              <el-input v-model="form.order_sn" size="small" placeholder="请输入订单号" class="w250" clearable/>
             </el-form-item>
           </el-col>
           <el-col :span="7">
             <el-form-item label="商品标题">
-              <el-input size="small" placeholder="请输入关键字" class="w250" />
+              <el-input v-model="form.goods_name" size="small" placeholder="请输入关键字" class="w250"clearable />
             </el-form-item>
           </el-col>
           <el-col :span="7">
             <el-form-item label="买家">
-              <el-input size="small" placeholder="请输入手机号" class="w250" />
+              <el-input v-model="form.buyer_phone" size="small" placeholder="请输入手机号" class="w250" clearable/>
             </el-form-item>
           </el-col>
           <template v-if="isExt">
             <el-col :span="7">
               <el-form-item label="下单时间">
-                <el-date-picker v-model="form.value1" size="small" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" class="w250" />
+                <el-date-picker v-model="form.create_time" size="small" type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" class="w250" clearable/>
               </el-form-item>
             </el-col>
             <el-col :span="7">
               <el-form-item label="订单来源">
-                <el-select v-model="form.value2" size="small" placeholder="请选择" class="w250">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
+                <SelOrderSource v-model="form.order_type" size="small"  class="w250" filterable clearable @change="onChange"/>
               </el-form-item>
             </el-col>
             <el-col :span="7">
               <el-form-item label="渠道类型">
-                <el-select v-model="form.value2" size="small" placeholder="请选择" class="w250">
-                  <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
+                <SelOrderChannel v-model="form.channel_type" size="small" class="w250" filterable clearable @change="onChange"/>
               </el-form-item>
             </el-col>
             <el-col :span="21">
               <el-form-item label="订单状态">
-                <el-select v-model="form.value2" size="small" placeholder="请选择" class="w250">
+                <el-select v-model="form.order_status" size="small" placeholder="请选择" clearable class="w250">
                   <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
               </el-form-item>
@@ -49,8 +45,8 @@
           </template>
           <el-col :span="3">
             <div class="toolbar-btn flex-c">
-              <el-button size="small" type="primary">查询</el-button>
-              <el-button size="small">重置</el-button>
+              <el-button size="small" type="primary" @click="loadData">查询</el-button>
+              <el-button size="small" >重置</el-button>
               <span v-if="!isExt" class="text-btn ml10 fz15" @click="isExt = true"> 展开 <i class="el-icon-arrow-down"></i> </span>
               <span v-else class="text-btn ml10 fz15" @click="isExt = false"> 收起 <i class="el-icon-arrow-up "></i> </span>
             </div>
@@ -78,30 +74,31 @@
         </div>
       </div>
 
-      <TableTemplate style="margin-top:10px" />
+      <TableTemplate :tableData="tableData" style="margin-top:10px" />
       <pagination v-show="total > 0" :total="total" :page.sync="listPage.page" :limit.sync="listPage.pageSize" @pagination="loadData" />
     </div>
   </div>
 </template>
 
 <script>
-// import { } from '@/api'
+import { getOrderList} from '@/api/order'
 import TableTemplate from "./tableTemplate.vue";
+import SelOrderChannel from '@/components/SelectInput/selOrderChannel'
+import SelOrderSource from '@/components/SelectInput/selOrderSource'
 export default {
-  components: { TableTemplate },
+  components: { TableTemplate,SelOrderChannel,SelOrderSource },
   props: {},
   data() {
     return {
-      isExt: false,
+      isExt: true,
       activeName: "first",
       options: [
         { value: "全部", label: "全部" },
         { value: "其他", label: "其他" }
       ],
       form: {
-        value1: "",
-        value2: "全部"
       },
+      tableData:[],
       total: 1,
       listPage: {
         page: 0,
@@ -111,10 +108,20 @@ export default {
   },
   computed: {},
   watch: {},
-  created() {},
+  created() {
+    this.loadData()
+  },
   mounted() {},
   methods: {
-    loadData() {}
+    loadData() {
+      getOrderList(this.form).then(res => {
+        // console.log('res:', res)
+        this.tableData = res.result.data
+        this.total = res.result.total
+      })
+    },
+    onChange(val){
+    }
   }
 };
 </script>
@@ -136,6 +143,7 @@ export default {
   padding-bottom: 0px;
   .toolbar-btn {
     text-align: left;
+    margin-top:2px
   }
 }
 .table-top-wrap {
