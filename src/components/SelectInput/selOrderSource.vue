@@ -1,18 +1,25 @@
 <template>
     <el-select  v-on="$listeners" v-bind="customAttrs">
+      <el-option label="全部" value="" v-if="showAll"/>
       <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
     </el-select>
 </template>
 
 <script>
 //订单来源
+import {orderSource} from '@/utils/dict'
 export default {
   components: {},
-  props: {},
+  props: {
+    showAll:{
+      type: Boolean,
+      default:false
+    }
+  },
   inheritAttrs:false,
   data() {
     return {
-      options: [{id:1,name:'订单商城'},{id:2,name:'手工录入'}]
+      options: orderSource
     }
   },
   computed: {

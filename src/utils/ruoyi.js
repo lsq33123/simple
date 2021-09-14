@@ -172,3 +172,35 @@ export function handleTree(data, id, parentId, children) {
 	}
 	return tree;
 }
+
+/**
+ * 删除对象中值为空的key
+ * @param {*} obj 
+ * @returns 
+ */
+export const removeEmpty = (obj) => {
+  Object.keys(obj).forEach(key => {
+    if (obj[key] && typeof obj[key] === 'object') removeEmpty(obj[key]);
+    else if (obj[key] == null || obj[key] === undefined || obj[key] === '' ) delete obj[key];
+  });
+  return obj;
+};
+
+
+/**
+ * 复制内容到剪贴板
+ * @param {*} text 
+ */
+export function copyText(copyInfo) {
+  return new Promise((resolve, reject) => {
+    const copyUrl = document.createElement('input') // 创建一个input框获取需要复制的文本内容
+    copyUrl.value = copyInfo
+    const appDiv = document.getElementById('app')
+    appDiv.appendChild(copyUrl)
+    copyUrl.select()
+    document.execCommand('Copy')
+    copyUrl.remove()
+    resolve(true)
+  })
+
+}

@@ -11,7 +11,7 @@
         <div class="title-info">
           <span>
             订单号：{{ item.order_sn }}
-            <span class="text-btn">复制</span>
+            <span class="text-btn" @click="onCopy(item.order_sn)">复制</span>
           </span>
           <span>下单时间：{{ item.create_time }}</span>
           <span>订单来源：{{ item.order_type_name }}</span>
@@ -78,6 +78,7 @@
 <script>
 import RemarkDialog from "./remarkDialog.vue"
 import HistoryDrawer from "./historyDrawer.vue"
+import {copyText} from '@/utils/ruoyi'
 export default {
   components: { RemarkDialog, HistoryDrawer },
   props: {
@@ -144,7 +145,13 @@ export default {
   watch: {},
   created() {},
   mounted() {},
-  methods: {}
+  methods: {
+    onCopy(val){
+        copyText(val).then(res => {
+          this.$message.success('复制成功！')
+        })
+    }
+  }
 }
 </script>
 
@@ -219,6 +226,9 @@ export default {
           width: 100%;
           
         }
+      }
+      .row-info-item:last-child {
+        border-right:0px;
       }
     }
   }

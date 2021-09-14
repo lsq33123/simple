@@ -6,8 +6,8 @@
 </template>
 
 <script>
-//订单渠道类型
-import { getOrderChannelList } from "@/api/common"
+//收款渠道
+import { payChannel } from "@/utils/dict"
 export default {
   components: {},
   props: {
@@ -19,7 +19,7 @@ export default {
   inheritAttrs: false,
   data() {
     return {
-      options: []
+      options: payChannel
     }
   },
   computed: {
@@ -30,18 +30,9 @@ export default {
     }
   },
   watch: {},
-  created() {
-    this.loadData()
-  },
+  created() {},
   mounted() {},
-  methods: {
-    loadData() {
-      getOrderChannelList({ page: 1, page_size: 100 }).then(res => {
-        // console.log('res:', res)
-        this.options = res.result.data
-      })
-    }
-  }
+  methods: {}
 }
 </script>
 
