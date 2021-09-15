@@ -1,57 +1,40 @@
 <template>
   <div>
     <el-timeline>
-      <el-timeline-item>
-        <p class="el-timeline-item-title">售后审核通过</p>
-      </el-timeline-item>
-      <el-timeline-item>
-        <p class="el-timeline-item-title">发起售后</p>
-        <el-card>
-          <h4>张三</h4>
-          <p>2018/4/12 20:46</p>
-        </el-card>
-      </el-timeline-item>
-
-      <el-timeline-item>
-        <p class="el-timeline-item-title">发货</p>
-        <el-card>
-          <h4>jinxia.feng</h4>
-          <p>2018/4/12 20:46</p>
-        </el-card>
-      </el-timeline-item>
-
-      <el-timeline-item>
-        <p class="el-timeline-item-title">修改订单 <span class="text-btn ml20" @click="onDet">详情</span></p>
-        <el-card>
-          <h4>xuanzhi.zeng</h4>
-          <p>2018/4/12 20:46</p>
-        </el-card>
-      </el-timeline-item>
-
-      <el-timeline-item>
-        <p class="el-timeline-item-title">创建订单 <span class="text-btn ml20" @click="onDet">详情</span></p>
-        <el-card>
-          <h4>xuanzhi.zeng</h4>
-          <p>2018/4/12 20:46</p>
-        </el-card>
-      </el-timeline-item>
+          <el-timeline-item v-for="(item,index) in timeLineArr" :key="index">
+            <p class="el-timeline-item-title">
+              {{item.operation_name}}
+              <span class="text-btn ml20" v-if="item.operation_type === 'create_order' || item.operation_type === 'create_order'" @click="onDetail(item)">详情</span>
+              </p>
+            <el-card>
+              <h4>{{item.operator}} </h4>
+              <p>{{item.operation_time_string}} </p>
+            </el-card>
+          </el-timeline-item>
     </el-timeline>
+        <OrderDetDialog :isShow.sync="isShowDetail" :form="form"/>
   </div>
 </template>
 
 <script>
 import { getOrderHistoryDetail } from "@/api/order"
+import OrderDetDialog from './orderDetDialog.vue'
 export default {
-  components: {},
+  components: {OrderDetDialog},
   props: {},
   data() {
     return {
-      order_sn: ""
+      order_sn: "",
+      isShowDetail:false,
+      form:{},
+      timeLineArr:[]
     }
   },
   computed: {},
   watch: {},
-  created() {},
+  created() {
+    this.loadData()
+  },
   mounted() {},
   methods: {
     loadData(order_sn) {
@@ -63,9 +46,15 @@ export default {
         })
       }
     },
-    onDet() {
-      this.$emit("onDet")
-    }
+    onDetail(item){
+      this.isShowDetail = true
+      this.form ={
+        ...item.order_Info,
+        receive_info: item.receive_info,
+        order_goods:item.order_goods,
+        order_logistics:item.order_logistics,
+      }
+    },
   }
 }
 </script>

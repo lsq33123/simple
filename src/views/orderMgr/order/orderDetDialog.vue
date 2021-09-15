@@ -1,6 +1,6 @@
 <template>
-    <el-dialog :visible="isShow" title="订单详情" width="1200px" :before-close="onClose" custom-class="dialog-padding">
-      <DetForm  :detail="form"/>
+    <el-dialog :visible="isShow" title="订单详情" width="1300px" :before-close="onClose" custom-class="dialog-padding">
+      <DetForm  :form="form"/>
       <span slot="footer" class="dialog-footer">
         <!-- <el-button @click="onClose">取 消</el-button> -->
         <el-button type="primary" @click="onSure">确 定</el-button>

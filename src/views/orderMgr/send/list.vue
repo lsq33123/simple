@@ -19,7 +19,7 @@
           </el-tabs>
         </div>
         <span>
-          <i class="el-icon-refresh-right" @click="loadData"></i>
+          <i class="el-icon-refresh-right pointer" @click="loadData"></i>
           <!-- <i class="el-icon-setting"></i> -->
           <Setting :columns="columns" @onChangeCheck="onChangeCheck"/>
         </span>
@@ -95,6 +95,12 @@ export default {
   computed: {},
   watch: {},
   created() {
+    console.log('this.$route.params.order_sn:', this.$route.query.order_sn)
+    if(this.$route.query.order_sn) {
+      this.orderNo =this.$route.query.order_sn
+      this.orderStatus = 1
+      this.activeName = "1"
+    }
     this.loadData()
   },
   mounted() {},

@@ -25,3 +25,5 @@ export const getOrderDetail = body => request.post('/order/detail',  body )
 export const setOrderRemark = body => request.post('/order/remark',  body )
 //订单 - 操作历史/快照
 export const getOrderHistoryDetail = body => request.post('/order/history',  body )
+//订单-导出csv
+export const getExportFileOrder = params => request.get('/order/exportFile',  {params} )

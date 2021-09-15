@@ -204,3 +204,21 @@ export function copyText(copyInfo) {
   })
 
 }
+
+/**
+ * 导出csv
+ * @param {*} content  内容
+ * @param {*} fileName 文件名
+ */
+
+export function exportCSV (content,fileName="导出文件") {
+  let data = '';
+  // data = "\ufeff" + content;
+  data =  content;
+  let blob = new Blob([data], { type: 'text/csv,charset=UTF-8'});
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement("a");
+  a.download = fileName + ".csv";
+  a.href = url;
+  a.click();
+}

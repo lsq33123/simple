@@ -25,7 +25,8 @@
               </div>
             </div>
             <div v-else-if="col.prop === 'order_status_name'" class="flex flex-align-center con-cell row-info-item-prop">
-              <el-tag type="success">{{ item.order_status_name }}</el-tag>
+              <!-- <el-tag type="success">{{ item.order_status_name }}</el-tag> -->
+              {{ item.order_status_name }}
             </div>
             <div v-else-if="col.prop === 'v5'" class="row-info-item-prop">
               <div class="flex flex-align-center con-cell" v-for="(good, gindex) in item.order_goods" :key="gindex">
@@ -53,10 +54,11 @@
 
             <div v-else-if="col.prop === 'action'" class="flex flex-align-center con-cell row-info-item-prop">
               <div style="line-height:30px">
-                <span class="text-btn mr10" @click="onDetail(item.order_s)">详情</span>
+                <span class="text-btn mr10" @click="onDetail(item.id)">详情</span>
                 <span class="text-btn mr10" @click="onRemark(item.order_sn)">备注</span>
-                <span class="text-btn mr10">发货</span>
-                <span class="text-btn mr10">发起售后</span>
+                <span class="text-btn mr10" @click="onSend(item.order_sn)" v-if="item.order_status ===10 || item.order_status ===20">发货</span>
+                <span class="text-btn mr10" @click="onCancel(item.order_sn)" v-if="item.order_type ===1 &&  item.order_status === 0">取消订单</span>
+                <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999">发起售后</span>
                 <span class="text-btn mr10" @click="onHistory(item.order_sn)">操作历史</span>
               </div>
             </div>
@@ -70,7 +72,7 @@
         </div>
       </div>
     </div>
-    <RemarkDialog :isShow.sync="isShowRemark" @onSure="onSureRemark"/>
+    <RemarkDialog :isShow.sync="isShowRemark" :currOrderNo="currOrderNo" @onSure="onSureRemark"/>
     <HistoryDrawer :isShow.sync="isShowHistory" ref="history"/>
   </div>
 </template>
@@ -79,7 +81,6 @@
 import RemarkDialog from "./remarkDialog.vue"
 import HistoryDrawer from "./historyDrawer.vue"
 import {copyText} from '@/utils/ruoyi'
-import {setOrderRemark} from '@/api/order'
 export default {
   components: { RemarkDialog, HistoryDrawer },
   props: {
@@ -96,7 +97,7 @@ export default {
     return {
       isShowRemark: false,
       isShowHistory: false,
-      currOrder:'',
+      currOrderNo:'',
     }
   },
   computed: {},
@@ -109,31 +110,31 @@ export default {
           this.$message.success('复制成功！')
         })
     },
-    onDetail(order_sn){
-      this.currOrder = order_sn
-      this.$router.push("/orderMgr/orderDet")
+    onDetail(id){
+      // this.currOrderNo = order_sn
+      this.$router.push("/orderMgr/orderDet?orderId=" + id)
+    },
+    onSend(order_sn){
+      this.currOrderNo = order_sn
+      this.$router.push("/orderMgr/sendList?order_sn=" + order_sn)
+    },
+    onCancel(order_sn){
+      this.currOrderNo = order_sn
+      // this.$router.push("/orderMgr/sendList?order_sn=" + order_sn)
     },
     onRemark(order_sn){
-      this.currOrder = order_sn
+      this.currOrderNo = order_sn
       this.isShowRemark = true
     },
     onHistory(order_sn){
-      this.currOrder = order_sn
+      this.currOrderNo = order_sn
       this.isShowHistory = true
       this.$refs.history.loadData(order_sn)
     },
-    onSureRemark(text){
-      if(text){
-        setOrderRemark({order_sn:this.currOrder,remark:text}).then(res => {
-          // console.log('res:', res)
-          this.msgSuccess('备注成功')
-          this.$emit('reload')
-          this.isShowRemark = false
-        })
-      } else {
-        this.msgWarning('请输入备注内容~')
-      }
-    }
+    onSureRemark(){
+      this.isShowRemark = false
+      this.$emit('reload')
+    },
   }
 }
 </script>

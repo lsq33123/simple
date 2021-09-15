@@ -2,7 +2,7 @@
   <div class="container-wrap">
     <div class="left-wrap ">
       <div class="block-wrap ">
-        <el-form label-width="120px">
+        <el-form label-width="120px" ref="form1" :model="buyer" :rules="rules">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
               <span>商品信息</span>
@@ -24,19 +24,19 @@
 
               <el-table-column label="实收金额(元)" min-width="150">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.actual_price" class="w200" />
+                  <el-input v-model="scope.row.actual_price" class="w200" @input="onInputNum" />
                 </template>
               </el-table-column>
 
               <el-table-column label="商品数量" min-width="150">
                 <template slot-scope="scope">
-                  <el-input-number v-model="scope.row.count" controls-position="right" :min="1" />
+                  <el-input-number v-model="scope.row.count" controls-position="right" :min="1" @input="onInputNum" />
                 </template>
               </el-table-column>
 
               <el-table-column label="操作" width="100">
                 <template slot-scope="scope">
-                  <i class="el-icon-delete table-delete-btn" @click="detRow(scoped.$index)"></i>
+                  <i class="el-icon-delete table-delete-btn" @click="detRow(scope.$index)"></i>
                 </template>
               </el-table-column>
             </el-table>
@@ -54,24 +54,39 @@
               <span>买家信息</span>
             </div>
 
-            <el-form-item label="渠道类型" required>
-              <SelOrderChannel v-model="buyer.channel_type" class="w200" />
+            <el-form-item label="渠道类型" prop="channel_type">
+              <el-select v-model="buyer.channel_type" class="w200" @change="onChangeChannelType" filterable>
+                <el-option v-for="item in channelTypeList" :key="item.id" :label="item.name" :value="item.id"> </el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="手机号" required>
-              <SelPhoneCode v-model="buyer.phone_code_id" class="w200" />
-              <el-input v-model="buyer.buyer_phone" placeholder="请输入手机号" class="w250" @input="onInputPhone" />
-              <div class="mark-icon-wrap">
-                <svg-icon icon-class="check" class-name="check-panel-icon" />
-                已注册
-              </div>
-              <div class="mark-icon-wrap">
-                <svg-icon icon-class="check" class-name="check-panel-icon" />
-                首购
-              </div>
+            <el-form-item label="代理商" prop="sales_agent_id" v-if="isNeedAgent" required>
+              <SelSalesAgent v-model="buyer.sales_agent_id" class="w200" filterable />
             </el-form-item>
-            <el-form-item label="姓名" required>
-              <el-input v-model="buyer.buyer_name" placeholder="请输入买家姓名" class="w450" />
-            </el-form-item>
+            <template v-else>
+              <el-form-item label="手机号" prop="buyer_phone">
+                <SelPhoneCode v-model="buyer.phone_code_id" class="w200" />
+                <el-input v-model="buyer.buyer_phone" placeholder="请输入手机号" class="w250" @input="onInputPhone" />
+                <div class="mark-icon-wrap" v-if="buyer.isReg === 1">
+                  <svg-icon icon-class="check" class-name="check-panel-icon" />
+                  已注册
+                </div>
+                <div class="mark-icon-wrap" v-if="buyer.isReg === 0">
+                  <svg-icon icon-class="exclamstion" class-name="check-panel-icon" />
+                  未注册
+                </div>
+                <div class="mark-icon-wrap" v-if="buyer.isFirst === 1">
+                  <svg-icon icon-class="check" class-name="check-panel-icon" />
+                  首购
+                </div>
+                <div class="mark-icon-wrap" v-if="buyer.isFirst === 0">
+                  <svg-icon icon-class="exclamstion" class-name="check-panel-icon" />
+                  非首购
+                </div>
+              </el-form-item>
+              <el-form-item label="姓名" prop="buyer_name">
+                <el-input v-model="buyer.buyer_name" placeholder="请输入买家姓名" class="w450" />
+              </el-form-item>
+            </template>
           </el-card>
 
           <el-card class="box-card">
@@ -80,23 +95,24 @@
             </div>
             <el-row>
               <el-col :span="8">
-                <el-form-item label="收货人" required>
-                  <el-input v-model="buyer.receive.receive_name" class="w250" />
+                <el-form-item label="收货人" prop="receive.receive_name">
+                  <el-input v-model="buyer.receive.receive_name" placeholder="请输入收货人" class="w250" />
                 </el-form-item>
               </el-col>
               <el-col :span="16">
-                <el-form-item label="手机号" required>
+                <el-form-item label="手机号" prop="receive.receive_phone">
                   <SelPhoneCode v-model="buyer.receive.phone_code_id" class="w200" />
-                  <el-input v-model="buyer.receive.receive_phone" placeholder="请输入手机号码" class="w250" />
+                  <el-input v-model="buyer.receive.receive_phone" placeholder="请输入手机号码" class="w250"
+                  @input="v=>buyer.receive.receive_phone = v.replace(/[^\d]/g,'')"/>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="收货地址" required>
+                <el-form-item label="收货地址" prop="receive.address_area_ids">
                   <SelAddress v-model="buyer.receive.address_area_ids" placeholder="请选择省/市/区" class="w250" />
                 </el-form-item>
               </el-col>
               <el-col :span="16">
-                <el-form-item label="详细地址" required>
+                <el-form-item label="详细地址" prop="receive.receive_address">
                   <el-input v-model="buyer.receive.receive_address" placeholder="请输入详细地址" class="w450" />
                 </el-form-item>
               </el-col>
@@ -114,22 +130,22 @@
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="运费(元)" required>
-                  <el-input v-model="buyer.express_price" class="w250" />
+                <el-form-item label="运费(元)" prop="express_price">
+                  <el-input v-model="buyer.express_price" class="w250" :maxlength="6"/>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="实收金额(元)" required>
-                  <el-input v-model="buyer.payment_money" class="w250" />
+                <el-form-item label="实收金额(元)" prop="payment_money">
+                  <el-input v-model="buyer.payment_money" class="w250" disabled />
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="收款渠道" required>
+                <el-form-item label="收款渠道" prop="pay_channel">
                   <SelPayChannel v-model="buyer.pay_channel" class="w250" />
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="收款情况" required>
+                <el-form-item label="收款情况" prop="payment_type">
                   <el-select v-model="buyer.payment_type" class="w125">
                     <el-option label="先款后货" :value="1"> </el-option>
                     <el-option label="先货后款" :value="2"> </el-option>
@@ -138,14 +154,14 @@
                 </el-form-item>
               </el-col>
               <el-col :span="8">
-                <el-form-item label="收款时间" required>
+                <el-form-item label="收款时间" prop="pay_time">
                   <el-date-picker v-model="buyer.pay_time" type="date" placeholder="选择日期" class="w250" />
                 </el-form-item>
               </el-col>
-
-              <el-col :span="8">
+              <template v-if="buyer.payment_type ===1" >
+              <el-col :span="8" >
                 <el-form-item label="第三方支付单号">
-                  <el-input v-model="buyer.transaction_id" class="w250" />
+                  <el-input v-model="buyer.transaction_id" class="w250" :maxlength="100"/>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -153,6 +169,7 @@
                   <SingleImg v-model="buyer.pay_voucher" />
                 </el-form-item>
               </el-col>
+              </template>
             </el-row>
           </el-card>
         </el-form>
@@ -174,30 +191,72 @@
 
 <script>
 import { addOrderList, getGoodsList, appUserStatus } from "@/api/order"
+import { getOrderChannelList } from "@/api/common"
 import SelPhoneCode from "@/components/SelectInput/selPhoneCode"
 import SelAddress from "@/components/SelectInput/selAddress"
 import SelOrderSource from "@/components/SelectInput/selOrderSource"
 import SelPayChannel from "@/components/SelectInput/selPayChannel"
 import SelOrderStatus from "@/components/SelectInput/selOrderStatus"
-import SelOrderChannel from "@/components/SelectInput/selOrderChannel"
+import SelSalesAgent from "@/components/SelectInput/selSalesAgent"
 import SingleImg from "@/components/Upload/singleImg"
 import { debounce } from "@/utils"
 export default {
-  components: { SelPhoneCode, SelAddress, SelOrderSource, SelPayChannel, SelOrderStatus, SingleImg, SelOrderChannel },
+  components: { SelPhoneCode, SelAddress, SelOrderSource, SelPayChannel, SelOrderStatus, SingleImg, SelSalesAgent },
   props: {},
   data() {
+    var validatePass1 = (rule, value, callback) => {
+      if (this.isNeedAgent) {
+        if (value === "") {
+          callback(new Error("选择代理商"))
+        } else {
+          callback()
+        }
+      } else {
+        callback()
+      }
+    }
+
     return {
       goodList: [],
-      tableData: [{ v1: "" }, { v1: "" }],
-      isFirst: 0, //是否首购  1是
-      isReg: 0, //是否已注册 1是
+      tableData: [{ goods_id: "", actual_price: "" }],
+      channelTypeList: [],
+      currChannelObj: {},
       buyer: {
-        receive: {} //收货信息
-      } //买家信息
+        isFirst: '', //是否首购  1是
+        isReg: '', //是否已注册 1是
+        receive: {
+          address_area_ids: []
+        } //收货信息
+      }, //买家信息
+
+      rules: {
+        channel_type: [{ required: true, message: "请选择渠道类型", trigger: "change" }],
+        buyer_phone: [{ required: true, message: "请输入手机号", trigger: "blur" }],
+        buyer_name: [{ required: true, message: "请输入买家姓名", trigger: "blur" }],
+        sales_agent_id: [{ validator: validatePass1, trigger: "change" }],
+        "receive.receive_name": [{ required: true, message: "请输入收货人", trigger: "blur" }],
+        "receive.receive_phone": [{ required: true, message: "请输入手机号码", trigger: "blur" }],
+        "receive.address_area_ids": [{ required: true, message: "请选择省/市/区", trigger: "change" }],
+        "receive.receive_address": [{ required: true, message: "请输入详细地址", trigger: "blur" }],
+        express_price: [{ required: true, message: "请输入运费(元)", trigger: "blur" }],
+        payment_money: [{ required: true, message: "请输入实收金额(元)", trigger: "blur" }],
+        payment_type: [{ required: true, message: "请选择收款情况", trigger: "change" }],
+        pay_channel: [{ required: true, message: "请选择收款渠道", trigger: "change" }],
+        pay_time: [{ required: true, message: "请选择收款时间", trigger: "blur" }]
+      }
     }
   },
-  computed: {},
-  watch: {},
+  computed: {
+    isNeedAgent() {
+      //是否要填入代理商
+      return this.currChannelObj.order_type === 3
+    }
+  },
+  watch: {
+    'buyer.buyer_phone'(val){
+      this.buyer.buyer_phone = val.replace(/[^\d]/g,'')
+    }
+  },
   created() {
     this.initData()
   },
@@ -208,12 +267,28 @@ export default {
         // console.log('res:', res)
         this.goodList = res.result
       })
+      //获取代理商
+      getOrderChannelList({ page: 1, page_size: 100 }).then(res => {
+        // console.log('res:', res)
+        this.channelTypeList = res.result.data
+      })
     },
     addRow() {
-      this.tableData.push({ v1: "" })
+      this.tableData.push({ goods_id: "", actual_price: "" })
     },
     detRow(index) {
       this.tableData.splice(index, 1)
+    },
+    onInputNum() {
+      const total_money = this.tableData.reduce((total, item) => {
+        return total + (item.sales_price || 0) * (item.count || 0)
+      }, 0)
+      const payment_money = this.tableData.reduce((total, item) => {
+        return total + (item.actual_price || 0) * (item.count || 0)
+      }, 0)
+
+      this.$set(this.buyer, "total_money", total_money)
+      this.$set(this.buyer, "payment_money", payment_money)
     },
     onChangeGood(row, val) {
       const currGood = this.goodList.find(item => item.id === val)
@@ -224,33 +299,54 @@ export default {
         row.count = 1
       }
     },
-    onInputPhone(val) {
-      debounce( function(){
-        this.checkFirstReg(val)
-        console.log('44444:', 44444)
-      } , 500)
+    onChangeChannelType(val) {
+      if (val) {
+        this.currChannelObj = this.channelTypeList.find(item => item.id === val)
+      } else {
+        this.currChannelObj = {}
+      }
     },
+    onInputPhone: debounce(
+      function(params) {
+        this.checkFirstReg(params)
+      },
+      500,
+      false
+    ),
     checkFirstReg(tel) {
-      console.log("23:", 23)
-      // appUserStatus({mobile: tel}).then(res => {
-      //   this.isFirst = res.result.is_first_buy
-      //   this.isReg = res.result.is_registered
-      // })
+      appUserStatus({ mobile: this.buyer.buyer_phone }).then(res => {
+        this.buyer.isFirst = res.result.is_first_buy
+        this.buyer.isReg = res.result.is_registered
+      })
     },
     onSubmit() {
       const params = {
-        goods: this.tableData,
+        goods: this.tableData || [],
         ...this.buyer
       }
       console.log("params:", params)
 
-      if (params.receive.address_area_ids.length) {
-        params.receive.address_area_ids = params.receive.address_area_id.join(",")
+      if (params.goods.length <= 0) {
+        this.msgWarning("请先选择至少一个商品")
+        return
+      } else if (params.goods.some(item => item.goods_id === "")) {
+        this.msgWarning("请先完善商品信息")
+        return
       }
 
-      addOrderList(params).then(res => {
-        // console.log('res:', res)
-        this.msgSuccess("订单创建成功")
+      this.$refs["form1"].validate(valid => {
+        if (valid) {
+          if (params.receive.address_area_ids && params.receive.address_area_ids.length) {
+            params.receive.address_area_ids = params.receive.address_area_ids.join(",")
+          }
+          console.log("接口调用res:")
+          // addOrderList(params).then(res => {
+          //   // console.log('res:', res)
+          //   this.msgSuccess("订单创建成功")
+          // })
+        } else {
+          this.msgWarning("请完善相关信息")
+        }
       })
     }
   }

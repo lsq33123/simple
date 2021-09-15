@@ -79,25 +79,26 @@
           <el-button size="small" @click="onExport">导 出</el-button>
           <i class="el-icon-refresh-right pointer" @click="loadData"></i>
           <!-- <i class="el-icon-setting pointer"></i> -->
-          <Setting :columns="columns" @onChangeCheck="onChangeCheck"/>
+          <Setting :columns="columns" @onChangeCheck="onChangeCheck" />
         </div>
       </div>
 
-      <TableTemplate :tableData="tableData" :columns="columns"  class="mt10" @reload="loadData"/>
+      <TableTemplate :tableData="tableData" :columns="columns" class="mt10" @reload="loadData" />
       <pagination v-show="total > 0" :total="total" :page.sync="listPage.page" :limit.sync="listPage.page_size" @pagination="loadData" />
     </div>
   </div>
 </template>
 
 <script>
-import { getOrderList, getOrderStatus } from "@/api/order"
+import { getOrderList, getOrderStatus, getExportFileOrder } from "@/api/order"
 import TableTemplate from "./tableTemplate.vue"
 import SelOrderChannel from "@/components/SelectInput/selOrderChannel"
 import SelOrderSource from "@/components/SelectInput/selOrderSource"
 import SelOrderStatus from "@/components/SelectInput/selOrderStatus"
-import Setting from '@/components/RightToolbar/setting'
+import Setting from "@/components/RightToolbar/setting"
+import {exportCSV} from '@/utils/ruoyi'
 export default {
-  components: { TableTemplate, SelOrderChannel, SelOrderSource, SelOrderStatus ,Setting},
+  components: { TableTemplate, SelOrderChannel, SelOrderSource, SelOrderStatus, Setting },
   props: {},
   data() {
     return {
@@ -116,61 +117,61 @@ export default {
         page: 1,
         page_size: 20
       },
-            columns: [
+      columns: [
         {
           label: "商品",
           prop: "goods_name",
           width: 200,
-          show:true
+          show: true
         },
         {
           label: "订单状态",
           prop: "order_status_name",
           width: 100,
-          show:true
+          show: true
         },
 
         {
           label: "单价（元）",
           prop: "v5",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "数量",
           prop: "v6",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "实收（元）",
           prop: "payment_money",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "买家",
           prop: "buyer_phone",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "收货信息",
           prop: "v9",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "售后",
           prop: "v10",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "操作",
           prop: "action",
           width: 100,
-          show:true
+          show: true
         }
       ]
     }
@@ -190,11 +191,10 @@ export default {
       })
     },
     loadData() {
-
-      if(this.form.order_status === ''){
-        this.activeName = 'first'
+      if (this.form.order_status === "") {
+        this.activeName = "first"
       } else {
-        this.activeName = this.form.order_status + ''
+        this.activeName = this.form.order_status + ""
       }
 
       const params = { ...this.form, ...this.listPage }
@@ -225,16 +225,25 @@ export default {
       this.$router.push("/orderMgr/addOrderList")
     },
     onExport() {
-      this.$message.warning("稍后导出~")
+      const params = { ...this.form }
+      if (params.create_time && params.create_time.length) {
+        params.create_start = params.create_time[0]
+        params.create_end = params.create_time[1]
+      }
+      delete params.create_time
+      getExportFileOrder(params).then(res => {
+        exportCSV(res,'订单列表')
+        this.$message.success("导出成功")
+      })
     },
-    onChangeCheck(arr){
-      this.columns.forEach((item,index)=>{
-        if(arr.includes(item.label)){
+    onChangeCheck(arr) {
+      this.columns.forEach((item, index) => {
+        if (arr.includes(item.label)) {
           item.show = true
         } else {
           item.show = false
         }
-        this.$set(this.columns,index,item)
+        this.$set(this.columns, index, item)
       })
     }
   }

@@ -1,14 +1,12 @@
 <template>
     <el-select  v-on="$listeners" v-bind="customAttrs">
-      <el-option v-for="item in options" :key="item.id" :label="`${item.chinese_name}(+${item.phone_code})`" :value="item.id">
-        {{`${item.chinese_name}(${item.phone_code})`}}
-         </el-option>
+      <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"> </el-option>
     </el-select>
 </template>
 
 <script>
-//区号列表
-import {getPhoneCodeList } from '@/api/common'
+//获取代理商接口 - 下拉框
+import {getSalesAgent } from '@/api/common'
 export default {
   components: {},
   props: {},
@@ -32,9 +30,9 @@ export default {
   mounted() {},
   methods: {
     loadData(){
-      getPhoneCodeList({page:1,page_size:100}).then(res => {
+      getSalesAgent().then(res => {
         // console.log('res:', res)
-        this.options = res.result.data
+        this.options = res.result
       })
     }
   }

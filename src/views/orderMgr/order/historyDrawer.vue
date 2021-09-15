@@ -60,7 +60,12 @@ export default {
     },
     onDetail(item){
       this.isShowDetail = true
-      this.form ={...item}
+      this.form ={
+        ...item.order_Info,
+        receive_info: item.receive_info,
+        order_goods:item.order_goods,
+        order_logistics:item.order_logistics,
+      }
     },
     onClose() {
       this.$emit("update:isShow", false)

@@ -2,8 +2,12 @@
   <div>
     <el-drawer title="发货详情" :visible="isShow" direction="rtl" :before-close="onClose">
       <div class="order-info-wrap"><span>订单号：</span>{{form.current_info.order_sn}}</div>
-      <div class="order-info-wrap"><span>OBD序列号：</span>{{form.current_info.serial_number}}</div>
-      <div class="order-info-wrap"><span>发货方式：</span>{{form.current_info.logistics_mode_name}}</div>
+      <div class="order-info-wrap"><span>OBD序列号：</span>{{}}</div>
+      <div class="order-info-wrap flex"><span>发货方式：</span>
+      <div>
+        <p class="obd-sty" v-for="item in formObdList" :key="item">{{item}}</p>
+      </div>
+      </div>
       <div class="order-info-wrap"><span>快递信息：</span>{{form.current_info.express_company}} {{form.current_info.express_number}}</div>
       <div class="order-info-wrap"><span>发货时间：</span>{{form.current_info.delivery_time}}</div>
       <div class="order-info-wrap"><span>备注：</span>{{form.current_info.remark}}</div>
@@ -36,12 +40,18 @@ export default {
   data() {
     return {
       form:{
-        current_info:{}, //发货记录当前信息
+        current_info:{
+          serial_number:''
+        }, //发货记录当前信息
         logistics_snapshot_list:[] //发货记录快照
       }
     };
   },
-  computed: {},
+  computed: {
+    formObdList(){
+      return this.form.current_info.serial_number.split(',')
+    }
+  },
   watch: {},
   created() {},
   mounted() {},
@@ -75,6 +85,10 @@ export default {
   font-size: 15px;
 }
 
-
+.obd-sty{
+  padding:0;
+  margin:0;
+  margin-bottom: 10px;;
+}
 
 </style>

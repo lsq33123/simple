@@ -1,53 +1,53 @@
 <template>
   <div>
     <el-dialog :visible="isShow" title="发货" width="700px" :before-close="onClose" :close-on-click-modal="false" destroy-on-close>
-      {{ JSON.stringify(obdList) }}
-      <el-form label-width="100px">
-        <el-form-item label="OBD序列号" required>
+      <el-form label-width="100px" ref="form1" :model="form" :rules="rules">
+        <el-form-item label="OBD序列号" required prop="obd_list">
           <!-- <el-input placeholder="请输入" class="w350" @input="onInput"/> -->
-          <template    v-for="(item,index) in obdList"  >
-          <el-autocomplete
-            v-model="item.uuid"
-            :fetch-suggestions="inputChange"
-            placeholder="请输入OBD"
-            :trigger-on-focus="false"
-            @select="obj => handleSelect(item, obj)"
-            class="w350 margin"
-            max="100"
-          />
+          <template v-for="(item, index) in obdList">
+            <el-autocomplete
+              v-model="item.uuid"
+              :fetch-suggestions="inputChange"
+              placeholder="请输入OBD"
+              :trigger-on-focus="false"
+              @select="obj => handleSelect(item, obj)"
+              class="w350 margin"
+              max="100"
+              clearable
+            />
 
-          <div class="mark-icon-wrap" v-if="item.is_bind === 0">
-            <svg-icon icon-class="check" class-name="check-panel-icon" />
-            未绑定
-          </div>
-          <div class="mark-icon-wrap" v-if="item.is_bind === 1">
-            <svg-icon icon-class="error" class-name="check-panel-icon" />
-            已绑定
-          </div>
-          <div class="mark-icon-wrap" v-if="item.is_relation_order === 0">
-            <svg-icon icon-class="check" class-name="check-panel-icon" />
-            未发货
-          </div>
-          <div class="mark-icon-wrap" v-if="item.is_relation_order === 1">
-            <svg-icon icon-class="error" class-name="check-panel-icon" />
-            已发货
-          </div>
+            <div class="mark-icon-wrap" v-if="item.is_bind === 0">
+              <svg-icon icon-class="check" class-name="check-panel-icon" />
+              未绑定
+            </div>
+            <div class="mark-icon-wrap" v-if="item.is_bind === 1">
+              <svg-icon icon-class="error" class-name="check-panel-icon" />
+              已绑定
+            </div>
+            <div class="mark-icon-wrap" v-if="item.is_relation_order === 0">
+              <svg-icon icon-class="check" class-name="check-panel-icon" />
+              未发货
+            </div>
+            <div class="mark-icon-wrap" v-if="item.is_relation_order === 1">
+              <svg-icon icon-class="error" class-name="check-panel-icon" />
+              已发货
+            </div>
           </template>
         </el-form-item>
-        <el-form-item label="发货方式" required>
+        <el-form-item label="发货方式" prop="logistics_mode">
           <el-radio-group v-model="form.logistics_mode">
             <el-radio :label="1">快递</el-radio>
             <el-radio :label="2">自提</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="快递信息" required v-if="form.logistics_mode === 1">
+        <el-form-item label="快递信息" prop="express_number" v-if="form.logistics_mode === 1">
           <el-select v-model="form.express_company_id" placeholder="请选择" style="width:150px">
             <el-option v-for="item in compList" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
           <el-input v-model="form.express_number" placeholder="请输入" class="w370" />
         </el-form-item>
-        <el-form-item label="发货时间" required>
-          <el-date-picker v-model="form.delivery_time" type="date" placeholder="选择日期" class="w520" value-format="yyyy-MM-dd"/>
+        <el-form-item label="发货时间" prop="delivery_time">
+          <el-date-picker v-model="form.delivery_time" type="date" placeholder="选择日期" class="w520" value-format="yyyy-MM-dd" />
         </el-form-item>
         <el-form-item label="备注">
           <el-input v-model="form.remark" type="textarea" :autosize="{ minRows: 3, maxRows: 8 }" placeholder="请输入" max="600" class="w520" />
@@ -63,7 +63,7 @@
 
 <script>
 import { getExpressCompanyList } from "@/api/common"
-import {addOrderShipment} from '@/api/order'
+import { addOrderShipment } from "@/api/order"
 import { searchObdList } from "@/api/order"
 import { debounce } from "@/utils"
 export default {
@@ -84,21 +84,38 @@ export default {
     }
   },
   data() {
+    var validatePass1 = (rule, value, callback) => {
+      if (this.obdList.some(item => item.uuid === "")) {
+        callback(new Error("请把OBD序列号补充完整"))
+      } else {
+        callback()
+      }
+    }
+
     return {
       obdList: [],
       currList: [],
       form: {
         logistics_mode: 1
       },
-      compList: []
+      compList: [],
+      rules: {
+        obd_list: [{ validator: validatePass1, message: "请把OBD序列号补充完整", trigger: "blur" }],
+        logistics_mode: [{ required: true, message: "请选择发货方式", trigger: "change" }],
+        express_number: [{ required: true, message: "请输入快递信息", trigger: "change" }],
+        delivery_time: [{ required: true, message: "请选择发货时间", trigger: "change" }]
+      }
     }
   },
   computed: {},
   watch: {
     OBDNum(val) {
       for (let i = 0; i < this.OBDNum; i++) {
-        this.obdList.push({id:i, uuid: "", is_bind: '', is_relation_order: '' }) //是否绑定  是否关联订单
+        this.obdList.push({ id: i, uuid: "", is_bind: "", is_relation_order: "" }) //是否绑定  是否关联订单
       }
+    },
+    obdList() {
+      this.form.obd_list = this.obdList.map(item => item.uuid)
     }
   },
   created() {
@@ -135,18 +152,26 @@ export default {
       item.is_relation_order = obj.is_relation_order
     },
     onSure() {
-      const params = {...this.form}
-      params.obd_list = this.obdList.map(item=>item.uuid)
+      const params = { ...this.form }
+      params.obd_list = this.obdList.map(item => item.uuid)
       params.order_logistics_id = this.orderId
-      console.log('params:', params)
+      console.log("params:", params)
+      //自提不需要快递信息
+      if (params.logistics_mode === 2) {
+        delete params.express_company_id
+        delete params.express_number
+      }
 
-      addOrderShipment(params).then(res => {
-        this.msgSuccess("新增成功")
-        this.$emit('reload')
+      this.$refs["form1"].validate(valid => {
+        if (valid) {
+          addOrderShipment(params).then(res => {
+            this.msgSuccess("新增成功")
+            this.$emit("reload")
+            this.onClose()
+          })
+        } else {
+        }
       })
-
-
-      this.onClose()
     },
     onClose() {
       this.$emit("update:isShow", false)
@@ -167,14 +192,14 @@ export default {
     margin-left: 18px;
   }
 }
-.margin + .margin{
-  margin-top:10px;
+.margin + .margin {
+  margin-top: 10px;
 }
 
-.w370{
+.w370 {
   width: 370px;
 }
-.w520{
+.w520 {
   width: 520px !important;
 }
 </style>

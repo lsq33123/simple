@@ -8,6 +8,7 @@
       :on-remove="handleRemove"
       :on-exceed="handleExceed"
       :before-upload="beforeUpload"
+      :headers="headerObj"
       list-type="picture-card"
       class="avatar-uploader"
       :class="{ disabled: uploadDisabled }"
@@ -23,6 +24,7 @@
 
 <script>
 // import { } from '@/api'
+import { getToken } from '@/utils/auth'
 export default {
   components: {},
   model: {
@@ -39,7 +41,10 @@ export default {
     return {
       rootUrl: process.env.VUE_APP_BASE_API + "/uploadImage",
       dialogVisible: false,
-      uploadDisabled: false
+      uploadDisabled: false,
+      headerObj:{
+        "x-access-token":getToken()
+      }
     }
   },
   computed: {},
@@ -48,14 +53,14 @@ export default {
   mounted() {},
   methods: {
     handleSuccess(res, file) {
+      this.uploadDisabled = true
       this.$emit("onBindValue", res.result.path)
       this.$emit("handleSuccess", { res, file })
-      this.uploadDisabled = true
     },
     handleRemove(file, fileList) {
+      this.uploadDisabled = false
       this.$emit("onBindValue", "")
       this.$emit("handleRemove", { file, fileList })
-      this.uploadDisabled = false
     },
     handleExceed(files, fileList) {
       // 图片上传超过数量限制

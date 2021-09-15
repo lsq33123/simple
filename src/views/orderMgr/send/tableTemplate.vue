@@ -67,7 +67,7 @@
             <div v-else-if="col.prop === 'v11'" class="flex flex-align-center cell wp100 flex-column">
               <div :class="{ 'other-cell': good.logistics_list.length === 1 }" class="flex-c  wp100 flex-column cell-border" v-for="(good, gindex) in item.goods_list" :key="gindex">
                 <div class="other-cell flex-c child-cell-item" v-for="(list, lindex) in good.logistics_list" :key="lindex">
-                  <span>{{list.remark}} </span>
+                  {{list.remark}} 
                 </div>
               </div>
             </div>
@@ -77,7 +77,8 @@
                 <div class="other-cell flex-c child-cell-item" v-for="(list, lindex) in good.logistics_list" :key="lindex">
                   <div style="line-height:30px" v-if="list.sub_goods_type === 1">
                     <span class="text-btn mr10" @click="onDetail(list)">详情</span>
-                    <span class="text-btn mr10" @click="onSend(list.order_logistics_id,good.goods_count,list.sub_goods_count)">发货</span>
+                    <span class="text-btn mr10" @click="onSend(list.order_logistics_id,good.goods_count,list.sub_goods_count)" >发货</span>
+                    <!-- <span class="text-btn mr10" @click="onSend(list.order_logistics_id,good.goods_count,list.sub_goods_count)" v-if="list.order_status ===10 || list.order_status ===20">发货</span> -->
                   </div>
                 </div>
               </div>
@@ -266,6 +267,10 @@ export default {
 }
 
 .child-cell-item {
+  word-wrap:break-word;
+  word-break:break-all;
+  text-overflow:ellipsis; 
+  overflow: hidden;
   padding: 0px 10px;
   height: 110px;
 }

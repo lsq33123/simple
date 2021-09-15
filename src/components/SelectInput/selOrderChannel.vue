@@ -40,6 +40,9 @@ export default {
         // console.log('res:', res)
         this.options = res.result.data
       })
+    },
+    getData(){
+      return this.options
     }
   }
 }

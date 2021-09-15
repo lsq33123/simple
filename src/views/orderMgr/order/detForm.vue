@@ -7,7 +7,7 @@
         </div>
         <el-row>
           <el-col :span="6">
-            <el-form-item label="订单号"> {{form.transaction_id}}</el-form-item>
+            <el-form-item label="订单号"> {{form.order_sn}}</el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="下单时间"> {{form.pay_time}}</el-form-item>
@@ -86,13 +86,13 @@
         </div>
         <el-row>
           <el-col :span="6">
-            <el-form-item label="收货人"> {{form.receive_info && form.receive_info.receive_name || ''}}</el-form-item>
+            <el-form-item label="收货人"> {{form.order_receive_info && form.order_receive_info.receive_name || ''}}</el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="手机号"> {{form.receive_info && form.receive_info.receive_phone || ''}}</el-form-item>
+            <el-form-item label="手机号"> {{form.order_receive_info && form.order_receive_info.receive_phone || ''}}</el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="收货地址"> {{form.receive_info && form.receive_info.receive_address || ''}}</el-form-item>
+            <el-form-item label="收货地址"> {{form.order_receive_info && form.order_receive_info.receive_address || ''}}</el-form-item>
           </el-col>
         </el-row>
       </el-card>
@@ -126,7 +126,7 @@
             <el-form-item label="支付渠道"> {{form.pay_channel_name}}</el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="第三方支付单号" label-width="110px"> {{form.itemttttttttttt}}</el-form-item>
+            <el-form-item label="第三方支付单号" label-width="110px"> {{form.transaction_id}}</el-form-item>
           </el-col>
           <el-col :span="6">
             <!-- <el-form-item label="图片凭证"> {{form.pay_voucher}}</el-form-item> -->
@@ -140,7 +140,7 @@
             <el-form-item label="支付时间"> {{form.pay_time}}</el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="优惠券"> {{form.itemttttttttttt}}</el-form-item>
+            <el-form-item label="优惠券"> {{form.user_coupon_ids}}</el-form-item>
           </el-col>
         </el-row>
         <el-row>
@@ -192,7 +192,7 @@
 
 
     <el-dialog :visible.sync="isShowImg" title="图片凭证" width="1000px" :append-to-body="true">
-      {{ JSON.stringify(currImgUrl) }}
+      <!-- {{ JSON.stringify(currImgUrl) }} -->
       <img :src="currImgUrl" class="wp100 wh100"/>
     </el-dialog>
 
@@ -200,11 +200,11 @@
 </template>
 
 <script>
-import { getOrderDetail} from '@/api/order'
+
 export default {
   components: {},
   props: {
-    detail:{
+    form:{
       type:Object,
       default:()=>{}
     }
@@ -213,22 +213,15 @@ export default {
     return {
       isShowImg:false,
       currImgUrl: '',
-      form:{}
     };
   },
   computed: {},
   watch: {},
   created() {
-    this.loadData()
   },
   mounted() {},
   methods: {
-    loadData(){
-      getOrderDetail({"id": 94}).then(res => {
-        // console.log('res:', res)
-        this.form = res.result
-      })
-    },
+
     onShowIUmg(url){
       this.isShowImg = true
       this.currImgUrl = url
