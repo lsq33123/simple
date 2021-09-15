@@ -3,11 +3,11 @@
     <div class="toolbar-wrap block-wrap">
       <div style="display:flex;align-items:center">
         <label class="form-text">订单号</label>
-        <el-input size="small" placeholder="请输入订单号" class="input-width" />
+        <el-input v-model="orderNo" size="small" placeholder="请输入订单号" class="input-width" />
       </div>
       <div class="toolbar-btn">
-        <el-button size="small" type="primary">查询</el-button>
-        <el-button size="small">重置</el-button>
+        <el-button size="small" type="primary" @click="loadData">查询</el-button>
+        <el-button size="small" @click="orderNo = ''">重置</el-button>
       </div>
     </div>
 
@@ -15,56 +15,114 @@
       <div class="flex flex-align-center flex-justify-between table-top-wrap">
         <div class="tab-wrap__no-border">
           <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="用户管理" name="first"></el-tab-pane>
-            <el-tab-pane label="配置管理" name="second"></el-tab-pane>
-            <el-tab-pane label="角色管理" name="third"></el-tab-pane>
+            <el-tab-pane v-for="(item,index) in orderStatusList" :key="index" :label="item.name" :name="item.id+ ''" />
           </el-tabs>
         </div>
         <span>
-          <i class="el-icon-setting"></i>
-          <i class="el-icon-refresh-right"></i>
+          <i class="el-icon-refresh-right" @click="loadData"></i>
+          <!-- <i class="el-icon-setting"></i> -->
+          <Setting :columns="columns" @onChangeCheck="onChangeCheck"/>
         </span>
       </div>
 
-      <TableTemplate style="margin-top:10px" />
-      <pagination v-show="total > 0" :total="total" :page.sync="listPage.page" :limit.sync="listPage.pageSize" @pagination="loadData" />
+      <TableTemplate :tableData="tableData"  :columns="columns" class="mt10" @reload="loadData"/>
+      <pagination v-show="total > 0" :total="total" :page.sync="listPage.page" :limit.sync="listPage.page_szie" @pagination="loadData" />
     </div>
   </div>
 </template>
 
 <script>
-// import { } from '@/api'
-import TableTemplate from "./tableTemplate.vue";
+import { getOrderLogisticsList } from "@/api/order"
+import TableTemplate from "./tableTemplate.vue"
+import Setting from '@/components/RightToolbar/setting'
 export default {
-  components: { TableTemplate },
+  components: { TableTemplate ,Setting},
   props: {},
   data() {
     return {
-      activeName: "first",
-      options: [
-        { value: "全部", label: "全部" },
-        { value: "其他", label: "其他" }
-      ],
-      form: {
-        value1: "",
-        value2: "全部"
-      },
+      activeName: "1",
+      orderNo: "",
+      orderStatus: 1,
+      orderStatusList:[{id:1,name:'待发货'},{id:2,name:'已发货'}],
+      tableData: [],
       total: 1,
       listPage: {
-        page: 0,
-        pageSzie: 20
-      }
-    };
+        page: 1,
+        page_size: 20
+      },
+                  columns: [
+        {
+          label: "商品",
+          prop: "v1",
+          width: 500,
+          show:true
+        },
+
+        {
+          label: "发货状态",
+          prop: "v4",
+          width: 100,
+          show:true
+        },
+
+        {
+          label: "收货信息",
+          prop: "v9",
+          width: 100,
+          show:true
+        },
+        {
+          label: "发货信息",
+          prop: "v10",
+          width: 100,
+          show:true
+        },
+        {
+          label: "备注",
+          prop: "v11",
+          width: 100,
+          show:true
+        },
+        {
+          label: "操作",
+          prop: "action",
+          width: 100,
+          show:true
+        }
+      ]
+    }
   },
   computed: {},
   watch: {},
-  created() {},
+  created() {
+    this.loadData()
+  },
   mounted() {},
   methods: {
-    loadData() {},
-    handleClick() {}
+    loadData() {
+      const params = {
+        order_sn: this.orderNo,
+        order_status_ex: this.orderStatus,
+        ...this.listPage
+      }
+      getOrderLogisticsList(this.removeEmpty(params)).then(res => {
+        this.tableData = res.result.list || []
+        this.total = res.result.total
+      })
+    },
+    handleClick() {},
+        onChangeCheck(arr){
+      this.columns.forEach((item,index)=>{
+        if(arr.includes(item.label)){
+          item.show = true
+        } else {
+          item.show = false
+        }
+        this.$set(this.columns,index,item)
+      })
+    }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -126,7 +184,6 @@ export default {
   padding: 0 10px 0 0;
   box-sizing: border-box;
 }
-
 </style>
 
 <style>

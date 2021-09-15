@@ -1,7 +1,7 @@
 <template>
   <div class="table-wrap">
     <div class="title-wrap">
-      <div v-for="(item, index) in columns" :key="index" class="title-item-wrap" :style="{ 'min-width': item.width + 'px' }">
+      <div v-for="(item, index) in columns" :key="index" v-show="item.show" class="title-item-wrap" :style="{ 'min-width': item.width + 'px' }">
         <!-- <span v-if=""></span> -->
         <span>{{ item.label }}</span>
       </div>
@@ -17,7 +17,7 @@
           <span>订单来源：{{ item.order_type_name }}</span>
         </div>
         <div class="row-info flex">
-          <div v-for="(col, cIndex) in columns" :key="cIndex" class="row-info-item" :style="{ 'min-width': col.width + 'px' }">
+          <div v-for="(col, cIndex) in columns" :key="cIndex" v-show="col.show" class="row-info-item" :style="{ 'min-width': col.width + 'px' }">
             <div v-if="col.prop === 'goods_name'" class="row-info-item-prop">
               <div class="flex flex-align-center con-cell" v-for="(good, gindex) in item.order_goods" :key="gindex">
                 <img :src="good.goods_pic" />
@@ -53,11 +53,11 @@
 
             <div v-else-if="col.prop === 'action'" class="flex flex-align-center con-cell row-info-item-prop">
               <div style="line-height:30px">
-                <span class="text-btn mr10">详情</span>
-                <span class="text-btn mr10" @click="isShowRemark = true">备注</span>
+                <span class="text-btn mr10" @click="onDetail(item.order_s)">详情</span>
+                <span class="text-btn mr10" @click="onRemark(item.order_sn)">备注</span>
                 <span class="text-btn mr10">发货</span>
                 <span class="text-btn mr10">发起售后</span>
-                <span class="text-btn mr10" @click="isShowHistory = true">操作历史</span>
+                <span class="text-btn mr10" @click="onHistory(item.order_sn)">操作历史</span>
               </div>
             </div>
             <div v-else class="flex flex-align-center con-cell row-info-item-prop"></div>
@@ -70,8 +70,8 @@
         </div>
       </div>
     </div>
-    <RemarkDialog :isShow.sync="isShowRemark" />
-    <HistoryDrawer :isShow.sync="isShowHistory" />
+    <RemarkDialog :isShow.sync="isShowRemark" @onSure="onSureRemark"/>
+    <HistoryDrawer :isShow.sync="isShowHistory" ref="history"/>
   </div>
 </template>
 
@@ -79,10 +79,15 @@
 import RemarkDialog from "./remarkDialog.vue"
 import HistoryDrawer from "./historyDrawer.vue"
 import {copyText} from '@/utils/ruoyi'
+import {setOrderRemark} from '@/api/order'
 export default {
   components: { RemarkDialog, HistoryDrawer },
   props: {
     tableData: {
+      type: Array,
+      default: () => []
+    },
+    columns: {
       type: Array,
       default: () => []
     }
@@ -91,54 +96,7 @@ export default {
     return {
       isShowRemark: false,
       isShowHistory: false,
-      columns: [
-        {
-          label: "商品",
-          prop: "goods_name",
-          width: 200
-        },
-        {
-          label: "订单状态",
-          prop: "order_status_name",
-          width: 100
-        },
-
-        {
-          label: "单价（元）",
-          prop: "v5",
-          width: 100
-        },
-        {
-          label: "数量",
-          prop: "v6",
-          width: 100
-        },
-        {
-          label: "实收（元）",
-          prop: "payment_money",
-          width: 100
-        },
-        {
-          label: "买家",
-          prop: "buyer_phone",
-          width: 100
-        },
-        {
-          label: "收货信息",
-          prop: "v9",
-          width: 100
-        },
-        {
-          label: "售后",
-          prop: "v10",
-          width: 100
-        },
-        {
-          label: "操作",
-          prop: "action",
-          width: 100
-        }
-      ]
+      currOrder:'',
     }
   },
   computed: {},
@@ -150,6 +108,31 @@ export default {
         copyText(val).then(res => {
           this.$message.success('复制成功！')
         })
+    },
+    onDetail(order_sn){
+      this.currOrder = order_sn
+      this.$router.push("/orderMgr/orderDet")
+    },
+    onRemark(order_sn){
+      this.currOrder = order_sn
+      this.isShowRemark = true
+    },
+    onHistory(order_sn){
+      this.currOrder = order_sn
+      this.isShowHistory = true
+      this.$refs.history.loadData(order_sn)
+    },
+    onSureRemark(text){
+      if(text){
+        setOrderRemark({order_sn:this.currOrder,remark:text}).then(res => {
+          // console.log('res:', res)
+          this.msgSuccess('备注成功')
+          this.$emit('reload')
+          this.isShowRemark = false
+        })
+      } else {
+        this.msgWarning('请输入备注内容~')
+      }
     }
   }
 }
@@ -224,7 +207,6 @@ export default {
         }
         &-prop{
           width: 100%;
-          
         }
       }
       .row-info-item:last-child {

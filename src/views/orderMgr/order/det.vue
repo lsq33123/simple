@@ -14,7 +14,7 @@
       <el-button type="primary" size="small" class="w100">提 交</el-button>
     </div>
 
-    <LineDetDialog :isShow.sync="isShowLine"/>
+    <OrderDetDialog :isShow.sync="isShowLine"/>
   </div>
 </template>
 
@@ -22,12 +22,12 @@
 // import { } from '@/api'
 import DetForm from "./detForm.vue";
 import RightTimeLine from "./rightTimeLine.vue";
-import LineDetDialog from "./lineDetDialog.vue";
+import OrderDetDialog from "./orderDetDialog.vue";
 export default {
   components: {
     DetForm,
     RightTimeLine,
-    LineDetDialog
+    OrderDetDialog
   },
   props: {},
   data() {

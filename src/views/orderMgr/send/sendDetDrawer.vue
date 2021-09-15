@@ -1,39 +1,22 @@
 <template>
   <div>
-    <el-drawer title="操作记录" :visible="isShow" direction="rtl" :before-close="onClose">
-      <div class="order-info-wrap"><span>订单号：</span>Y20210124160923898909</div>
-      <div class="order-info-wrap"><span>OBD序列号：</span>066BFF545548786687164919</div>
-      <div class="order-info-wrap"><span>发货方式：</span>快递</div>
-      <div class="order-info-wrap"><span>快递信息：</span>顺丰 SF23345252654</div>
-      <div class="order-info-wrap"><span>发货时间：</span>2021-9-6 10:45</div>
-      <div class="order-info-wrap"><span>备注：</span>发货了呢</div>
+    <el-drawer title="发货详情" :visible="isShow" direction="rtl" :before-close="onClose">
+      <div class="order-info-wrap"><span>订单号：</span>{{form.current_info.order_sn}}</div>
+      <div class="order-info-wrap"><span>OBD序列号：</span>{{form.current_info.serial_number}}</div>
+      <div class="order-info-wrap"><span>发货方式：</span>{{form.current_info.logistics_mode_name}}</div>
+      <div class="order-info-wrap"><span>快递信息：</span>{{form.current_info.express_company}} {{form.current_info.express_number}}</div>
+      <div class="order-info-wrap"><span>发货时间：</span>{{form.current_info.delivery_time}}</div>
+      <div class="order-info-wrap"><span>备注：</span>{{form.current_info.remark}}</div>
       <div style="padding-right:20px">
         <el-timeline>
      
-          <el-timeline-item >
-          <p class="el-timeline-item-title">发货</p>
+          <el-timeline-item v-for="(item,index) in form.logistics_snapshot_list" :key="index">
+          <p class="el-timeline-item-title">{{item.operation_name}}</p>
             <el-card>
-              <h4>jinxia.feng</h4>
-              <p>2018/4/12 20:46</p>
+              <h4>{{item.operator}}</h4>
+              <p>{{item.operation_time_string}}</p>
             </el-card>
           </el-timeline-item>
-     
-          <el-timeline-item >
-          <p class="el-timeline-item-title">取消发货 </p>
-            <el-card>
-              <h4>xuanzhi.zeng</h4>
-              <p>2018/4/12 20:46</p>
-            </el-card>
-          </el-timeline-item>
-     
-          <el-timeline-item >
-          <p class="el-timeline-item-title">发货 </p>
-            <el-card>
-              <h4>xuanzhi.zeng</h4>
-              <p>2018/4/12 20:46</p>
-            </el-card>
-          </el-timeline-item>
-     
         </el-timeline>
       </div>
     </el-drawer>
@@ -41,23 +24,36 @@
 </template>
 
 <script>
-// import { } from '@/api'
+import {getLogisticsDetails } from '@/api/order'
 export default {
   components: {},
   props: {
     isShow: {
       type: Boolean,
       default: false
-    }
+    },
   },
   data() {
-    return {};
+    return {
+      form:{
+        current_info:{}, //发货记录当前信息
+        logistics_snapshot_list:[] //发货记录快照
+      }
+    };
   },
   computed: {},
   watch: {},
   created() {},
   mounted() {},
   methods: {
+    loadData(id){
+      if(id) {
+        getLogisticsDetails({order_logistics_id:id}).then(res => {
+          // console.log('res:', res)
+          this.form = res.result
+        })
+      }
+    },
     onClose() {
       this.$emit("update:isShow", false);
     }

@@ -46,7 +46,12 @@
             </el-col>
             <el-col :span="21">
               <el-form-item label="订单状态" prop="order_status">
-                <SelOrderStatus v-model="form.order_status" size="small" placeholder="请选择" showAll clearable class="w250" />
+                <!-- <SelOrderStatus v-model="form.order_status" size="small" placeholder="请选择" showAll clearable class="w250" /> -->
+
+                <el-select v-model="form.order_status" size="small" placeholder="请选择" clearable class="w250">
+                  <el-option label="全部" value="" />
+                  <el-option v-for="item in tabList" :key="item.value" :label="item.name" :value="item.value"> </el-option>
+                </el-select>
               </el-form-item>
             </el-col>
           </template>
@@ -66,61 +71,131 @@
       <div class="flex-c flex-justify-between table-top-wrap">
         <el-tabs v-model="activeName" class="tab-wrap__no-border" @tab-click="onChangeTab">
           <el-tab-pane label="全部" name="first"></el-tab-pane>
-          <el-tab-pane v-for="(item,index) in tabList" :key="index" :label="item.name" :name="item.id + ''"></el-tab-pane>
+          <el-tab-pane v-for="(item, index) in tabList" :key="index" :label="item.name" :name="item.value + ''"></el-tab-pane>
         </el-tabs>
 
         <div class="flex-c">
           <el-button size="small" type="primary" @click="onAdd">创建订单</el-button>
           <el-button size="small" @click="onExport">导 出</el-button>
           <i class="el-icon-refresh-right pointer" @click="loadData"></i>
-          <i class="el-icon-setting"></i>
+          <!-- <i class="el-icon-setting pointer"></i> -->
+          <Setting :columns="columns" @onChangeCheck="onChangeCheck"/>
         </div>
       </div>
 
-      <TableTemplate :tableData="tableData" style="margin-top:10px" />
+      <TableTemplate :tableData="tableData" :columns="columns"  class="mt10" @reload="loadData"/>
       <pagination v-show="total > 0" :total="total" :page.sync="listPage.page" :limit.sync="listPage.page_size" @pagination="loadData" />
     </div>
   </div>
 </template>
 
 <script>
-import { getOrderList } from "@/api/order"
+import { getOrderList, getOrderStatus } from "@/api/order"
 import TableTemplate from "./tableTemplate.vue"
 import SelOrderChannel from "@/components/SelectInput/selOrderChannel"
 import SelOrderSource from "@/components/SelectInput/selOrderSource"
 import SelOrderStatus from "@/components/SelectInput/selOrderStatus"
-import {orderStatus}from '@/utils/dict'
+import Setting from '@/components/RightToolbar/setting'
 export default {
-  components: { TableTemplate, SelOrderChannel, SelOrderSource, SelOrderStatus },
+  components: { TableTemplate, SelOrderChannel, SelOrderSource, SelOrderStatus ,Setting},
   props: {},
   data() {
     return {
-      isExt: true,
+      isExt: false,
       activeName: "first",
-      tabList:orderStatus,
+      tabList: [],
       form: {
-        goods_name:'',
-        order_type:'',
-        channel_type:'',
-        order_status:'',
+        goods_name: "",
+        order_type: "",
+        channel_type: "",
+        order_status: ""
       },
       tableData: [],
       total: 1,
       listPage: {
-        page: 0,
-        page_szie: 20
-      }
+        page: 1,
+        page_size: 20
+      },
+            columns: [
+        {
+          label: "商品",
+          prop: "goods_name",
+          width: 200,
+          show:true
+        },
+        {
+          label: "订单状态",
+          prop: "order_status_name",
+          width: 100,
+          show:true
+        },
+
+        {
+          label: "单价（元）",
+          prop: "v5",
+          width: 100,
+          show:true
+        },
+        {
+          label: "数量",
+          prop: "v6",
+          width: 100,
+          show:true
+        },
+        {
+          label: "实收（元）",
+          prop: "payment_money",
+          width: 100,
+          show:true
+        },
+        {
+          label: "买家",
+          prop: "buyer_phone",
+          width: 100,
+          show:true
+        },
+        {
+          label: "收货信息",
+          prop: "v9",
+          width: 100,
+          show:true
+        },
+        {
+          label: "售后",
+          prop: "v10",
+          width: 100,
+          show:true
+        },
+        {
+          label: "操作",
+          prop: "action",
+          width: 100,
+          show:true
+        }
+      ]
     }
   },
   computed: {},
   watch: {},
   created() {
+    this.initData()
     this.loadData()
   },
   mounted() {},
   methods: {
+    initData() {
+      getOrderStatus().then(res => {
+        // console.log('res:', res)
+        this.tabList = res.result
+      })
+    },
     loadData() {
-      
+
+      if(this.form.order_status === ''){
+        this.activeName = 'first'
+      } else {
+        this.activeName = this.form.order_status + ''
+      }
 
       const params = { ...this.form, ...this.listPage }
       if (params.create_time && params.create_time.length) {
@@ -135,24 +210,33 @@ export default {
       })
     },
     onChange(val) {},
-      onChangeTab(tab){
-        if(tab.name === 'first'){
-          this.form.order_status = ''
-        } else {
-          this.form.order_status = parseInt(tab.name)
-        }
-        this.loadData()
-      }    ,
-      onReset(){
-        this.$refs.form.resetFields()
-      },
-      onAdd(){
-        this.$router.push('/orderMgr/addOrderList')
-      },
-      onExport(){
-        this.$message.warning('稍后导出~')
+    onChangeTab(tab) {
+      if (tab.name === "first") {
+        this.form.order_status = ""
+      } else {
+        this.form.order_status = parseInt(tab.name)
       }
-
+      this.loadData()
+    },
+    onReset() {
+      this.$refs.form.resetFields()
+    },
+    onAdd() {
+      this.$router.push("/orderMgr/addOrderList")
+    },
+    onExport() {
+      this.$message.warning("稍后导出~")
+    },
+    onChangeCheck(arr){
+      this.columns.forEach((item,index)=>{
+        if(arr.includes(item.label)){
+          item.show = true
+        } else {
+          item.show = false
+        }
+        this.$set(this.columns,index,item)
+      })
+    }
   }
 }
 </script>

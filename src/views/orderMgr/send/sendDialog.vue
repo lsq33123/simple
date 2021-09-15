@@ -1,35 +1,56 @@
 <template>
   <div>
-    <el-dialog :visible="isShow" title="发货" width="700px" :before-close="onClose">
+    <el-dialog :visible="isShow" title="发货" width="700px" :before-close="onClose" :close-on-click-modal="false" destroy-on-close>
+      {{ JSON.stringify(obdList) }}
       <el-form label-width="100px">
         <el-form-item label="OBD序列号" required>
-          <el-input placeholder="请输入" class="w350" @input="onInput"/>
-          <div class="mark-icon-wrap">
+          <!-- <el-input placeholder="请输入" class="w350" @input="onInput"/> -->
+          <template    v-for="(item,index) in obdList"  >
+          <el-autocomplete
+            v-model="item.uuid"
+            :fetch-suggestions="inputChange"
+            placeholder="请输入OBD"
+            :trigger-on-focus="false"
+            @select="obj => handleSelect(item, obj)"
+            class="w350 margin"
+            max="100"
+          />
+
+          <div class="mark-icon-wrap" v-if="item.is_bind === 0">
             <svg-icon icon-class="check" class-name="check-panel-icon" />
-            已注册
+            未绑定
           </div>
-          <div class="mark-icon-wrap">
+          <div class="mark-icon-wrap" v-if="item.is_bind === 1">
+            <svg-icon icon-class="error" class-name="check-panel-icon" />
+            已绑定
+          </div>
+          <div class="mark-icon-wrap" v-if="item.is_relation_order === 0">
             <svg-icon icon-class="check" class-name="check-panel-icon" />
-            首购
+            未发货
           </div>
+          <div class="mark-icon-wrap" v-if="item.is_relation_order === 1">
+            <svg-icon icon-class="error" class-name="check-panel-icon" />
+            已发货
+          </div>
+          </template>
         </el-form-item>
         <el-form-item label="发货方式" required>
-          <el-radio-group v-model="radio">
-            <el-radio :label="3">快递</el-radio>
-            <el-radio :label="6">自提</el-radio>
+          <el-radio-group v-model="form.logistics_mode">
+            <el-radio :label="1">快递</el-radio>
+            <el-radio :label="2">自提</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="快递信息" required v-if="radio === 3">
-          <el-select v-model="value" placeholder="请选择" style="width:160px">
-            <el-option v-for="item in compList" :key="item.code" :label="item.name" :value="item.code"> </el-option>
+        <el-form-item label="快递信息" required v-if="form.logistics_mode === 1">
+          <el-select v-model="form.express_company_id" placeholder="请选择" style="width:150px">
+            <el-option v-for="item in compList" :key="item.id" :label="item.name" :value="item.id"> </el-option>
           </el-select>
-          <el-input placeholder="请输入" style="width:400px" />
+          <el-input v-model="form.express_number" placeholder="请输入" class="w370" />
         </el-form-item>
         <el-form-item label="发货时间" required>
-          <el-date-picker v-model="value1" type="date" placeholder="选择日期" class="w350" />
+          <el-date-picker v-model="form.delivery_time" type="date" placeholder="选择日期" class="w520" value-format="yyyy-MM-dd"/>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" placeholder="请输入" v-model="textarea2" class="w350" />
+          <el-input v-model="form.remark" type="textarea" :autosize="{ minRows: 3, maxRows: 8 }" placeholder="请输入" max="600" class="w520" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -42,50 +63,96 @@
 
 <script>
 import { getExpressCompanyList } from "@/api/common"
+import {addOrderShipment} from '@/api/order'
 import { searchObdList } from "@/api/order"
+import { debounce } from "@/utils"
 export default {
   components: {},
   props: {
     isShow: {
       type: Boolean,
       default: false
+    },
+    OBDNum: {
+      type: Number,
+      default: 0
+    },
+    //发货记录id
+    orderId: {
+      type: Number,
+      default: 0
     }
   },
   data() {
     return {
-      radio: 3,
-      textarea2: "",
-      value1: "",
+      obdList: [],
+      currList: [],
+      form: {
+        logistics_mode: 1
+      },
       compList: []
-    };
+    }
   },
   computed: {},
-  watch: {},
+  watch: {
+    OBDNum(val) {
+      for (let i = 0; i < this.OBDNum; i++) {
+        this.obdList.push({id:i, uuid: "", is_bind: '', is_relation_order: '' }) //是否绑定  是否关联订单
+      }
+    }
+  },
   created() {
-    this.initData();
+    this.initData()
   },
   mounted() {},
   methods: {
     initData() {
       getExpressCompanyList().then(res => {
         // console.log('res:', res)
-        this.compList = res.result.list;
-      });
+        this.compList = res.result.list
+      })
     },
-    onInput(val){
-        this.searchObdList({"order_logistics_id": 1, "uuid": val}).then(res => {
-          // console.log('res:', res)
-          
+    onInput(val) {
+      this.searchObdList({ order_logistics_id: 1, uuid: val }).then(res => {
+        // console.log('res:', res)
+      })
+    },
+    inputChange(name, callback) {
+      debounce(this.querySearch(name, callback), 3000, false)
+    },
+    querySearch(queryString, cb) {
+      searchObdList({ order_logistics_id: this.orderId, uuid: queryString }).then(res => {
+        const arr = res.result.list || []
+        this.currList = arr.map(item => {
+          item.value = item.uuid
+          return item
         })
+        cb(this.currList)
+      })
+    },
+    handleSelect(item, obj) {
+      item.is_bind = obj.is_bind
+      item.is_relation_order = obj.is_relation_order
     },
     onSure() {
-      this.onClose();
+      const params = {...this.form}
+      params.obd_list = this.obdList.map(item=>item.uuid)
+      params.order_logistics_id = this.orderId
+      console.log('params:', params)
+
+      addOrderShipment(params).then(res => {
+        this.msgSuccess("新增成功")
+        this.$emit('reload')
+      })
+
+
+      this.onClose()
     },
     onClose() {
-      this.$emit("update:isShow", false);
+      this.$emit("update:isShow", false)
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
@@ -99,5 +166,15 @@ export default {
     font-size: 20px;
     margin-left: 18px;
   }
+}
+.margin + .margin{
+  margin-top:10px;
+}
+
+.w370{
+  width: 370px;
+}
+.w520{
+  width: 520px !important;
 }
 </style>

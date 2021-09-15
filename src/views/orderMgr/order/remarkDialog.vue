@@ -31,7 +31,7 @@ export default {
   mounted() {},
   methods: {
     onSure() {
-      this.onClose();
+      this.$emit('onSure',this.value)
     },
     onClose() {
       this.$emit("update:isShow", false);
