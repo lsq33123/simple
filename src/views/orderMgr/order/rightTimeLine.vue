@@ -40,23 +40,34 @@
 </template>
 
 <script>
-// import { } from '@/api'
+import { getOrderHistoryDetail } from "@/api/order"
 export default {
   components: {},
   props: {},
   data() {
-    return {};
+    return {
+      order_sn: ""
+    }
   },
   computed: {},
   watch: {},
   created() {},
   mounted() {},
   methods: {
-    onDet(){
-      this.$emit('onDet')
+    loadData(order_sn) {
+      this.order_sn = order_sn
+      if (order_sn) {
+        getOrderHistoryDetail({ order_sn }).then(res => {
+          // console.log('res:', res)
+          this.timeLineArr = res.result
+        })
+      }
+    },
+    onDet() {
+      this.$emit("onDet")
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
