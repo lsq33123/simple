@@ -38,7 +38,13 @@ export const customRoutes = [
         path: '/orderMgr/addOrderList',
         component: (resolve) => require(['@/views/orderMgr/order/add'], resolve),
         name: 'addOrderList',
-        meta: { title: '创建订单', icon: 'build' }
+        meta: { title: '创建订单', icon: 'build' ,noCache: false  }
+      },
+      {
+        path: '/orderMgr/editOrderList',
+        component: (resolve) => require(['@/views/orderMgr/order/add'], resolve),
+        name: 'editOrderList',
+        meta: { title: '编辑订单', icon: 'build' }
       },
       {
         path: '/orderMgr/orderDet',

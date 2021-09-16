@@ -2,12 +2,11 @@
   <div>
     <el-drawer title="发货详情" :visible="isShow" direction="rtl" :before-close="onClose">
       <div class="order-info-wrap"><span>订单号：</span>{{form.current_info.order_sn}}</div>
-      <div class="order-info-wrap"><span>OBD序列号：</span>{{}}</div>
-      <div class="order-info-wrap flex"><span>发货方式：</span>
-      <div>
+      <div class="order-info-wrap flex"><span>OBD序列号：</span>
+            <div>
         <p class="obd-sty" v-for="item in formObdList" :key="item">{{item}}</p>
-      </div>
-      </div>
+      </div></div>
+      <div class="order-info-wrap "><span>发货方式：</span> {{form.logistics_mode_name}}</div>
       <div class="order-info-wrap"><span>快递信息：</span>{{form.current_info.express_company}} {{form.current_info.express_number}}</div>
       <div class="order-info-wrap"><span>发货时间：</span>{{form.current_info.delivery_time}}</div>
       <div class="order-info-wrap"><span>备注：</span>{{form.current_info.remark}}</div>

@@ -213,9 +213,9 @@ export function copyText(copyInfo) {
 
 export function exportCSV (content,fileName="导出文件") {
   let data = '';
-  // data = "\ufeff" + content;
-  data =  content;
-  let blob = new Blob([data], { type: 'text/csv,charset=UTF-8'});
+  data = "\ufeff" + content;
+  //type: 'text/csv,charset=UTF-8'
+  let blob = new Blob([data], { });
   let url = URL.createObjectURL(blob);
   let a = document.createElement("a");
   a.download = fileName + ".csv";

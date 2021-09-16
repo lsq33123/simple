@@ -58,6 +58,7 @@
                 <span class="text-btn mr10" @click="onRemark(item.order_sn)">备注</span>
                 <span class="text-btn mr10" @click="onSend(item.order_sn)" v-if="item.order_status ===10 || item.order_status ===20">发货</span>
                 <span class="text-btn mr10" @click="onCancel(item.order_sn)" v-if="item.order_type ===1 &&  item.order_status === 0">取消订单</span>
+                <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999" @click="onEdit(item.id)">编辑</span>
                 <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999">发起售后</span>
                 <span class="text-btn mr10" @click="onHistory(item.order_sn)">操作历史</span>
               </div>
@@ -66,13 +67,13 @@
           </div>
         </div>
 
-        <div v-if="item.customRemark || item.salerRemark" class="remark-info">
-          <p v-if="item.customRemark">买家备注：{{ item.customRemark }}</p>
-          <p v-if="item.salerRemark">商家备注：{{ item.salerRemark }}</p>
+        <div v-if="item.user_remark || item.remark" class="remark-info">
+          <p v-if="item.user_remark">买家备注：{{ item.user_remark }}</p>
+          <p v-if="item.remark">商家备注：{{ item.remark }}</p>
         </div>
       </div>
     </div>
-    <RemarkDialog :isShow.sync="isShowRemark" :currOrderNo="currOrderNo" @onSure="onSureRemark"/>
+    <RemarkDialog :isShow.sync="isShowRemark" v-if="isShowRemark" :currOrderNo="currOrderNo" @onSure="onSureRemark"/>
     <HistoryDrawer :isShow.sync="isShowHistory" ref="history"/>
   </div>
 </template>
@@ -113,6 +114,9 @@ export default {
     onDetail(id){
       // this.currOrderNo = order_sn
       this.$router.push("/orderMgr/orderDet?orderId=" + id)
+    },
+    onEdit(id){
+      this.$router.push("/orderMgr/editOrderList?orderId=" + id)
     },
     onSend(order_sn){
       this.currOrderNo = order_sn

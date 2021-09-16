@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :visible="isShow" title="备注" width="700" :before-close="onClose" :append-to-body="true">
+    <el-dialog :visible="isShow" title="备注" width="700" :before-close="onClose" :append-to-body="true" :close-on-click-modal="false">
       <el-input v-model="value" type="textarea" :autosize="{ minRows: 4, maxRows: 10 }" placeholder="请输入内容" maxlength="600" show-word-limit />
       <span slot="footer" class="dialog-footer">
         <el-button @click="onClose">取 消</el-button>

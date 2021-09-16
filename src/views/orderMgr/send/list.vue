@@ -7,7 +7,7 @@
       </div>
       <div class="toolbar-btn">
         <el-button size="small" type="primary" @click="loadData">查询</el-button>
-        <el-button size="small" @click="orderNo = ''">重置</el-button>
+        <el-button size="small" @click="onReset">重置</el-button>
       </div>
     </div>
 
@@ -15,17 +15,17 @@
       <div class="flex flex-align-center flex-justify-between table-top-wrap">
         <div class="tab-wrap__no-border">
           <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane v-for="(item,index) in orderStatusList" :key="index" :label="item.name" :name="item.id+ ''" />
+            <el-tab-pane v-for="(item, index) in orderStatusList" :key="index" :label="item.name" :name="item.id + ''" />
           </el-tabs>
         </div>
         <span>
           <i class="el-icon-refresh-right pointer" @click="loadData"></i>
           <!-- <i class="el-icon-setting"></i> -->
-          <Setting :columns="columns" @onChangeCheck="onChangeCheck"/>
+          <Setting :columns="columns" @onChangeCheck="onChangeCheck" />
         </span>
       </div>
 
-      <TableTemplate :tableData="tableData"  :columns="columns" class="mt10" @reload="loadData"/>
+      <TableTemplate :tableData="tableData" :columns="columns" :loading="tableLoading" class="mt10" @reload="loadData" />
       <pagination v-show="total > 0" :total="total" :page.sync="listPage.page" :limit.sync="listPage.page_szie" @pagination="loadData" />
     </div>
   </div>
@@ -34,60 +34,65 @@
 <script>
 import { getOrderLogisticsList } from "@/api/order"
 import TableTemplate from "./tableTemplate.vue"
-import Setting from '@/components/RightToolbar/setting'
+import Setting from "@/components/RightToolbar/setting"
 export default {
-  components: { TableTemplate ,Setting},
+  name: 'SendList',
+  components: { TableTemplate, Setting },
   props: {},
   data() {
     return {
       activeName: "1",
       orderNo: "",
       orderStatus: 1,
-      orderStatusList:[{id:1,name:'待发货'},{id:2,name:'已发货'}],
+      tableLoading:false,
+      orderStatusList: [
+        { id: 1, name: "待发货" },
+        { id: 2, name: "已发货" }
+      ],
       tableData: [],
       total: 1,
       listPage: {
         page: 1,
         page_size: 20
       },
-                  columns: [
+      columns: [
         {
           label: "商品",
           prop: "v1",
           width: 500,
-          show:true
+          show: true
         },
 
         {
           label: "发货状态",
           prop: "v4",
           width: 100,
-          show:true
+          show: true
         },
 
         {
           label: "收货信息",
           prop: "v9",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "发货信息",
           prop: "v10",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "备注",
           prop: "v11",
           width: 100,
-          show:true
+          show: true
         },
         {
           label: "操作",
           prop: "action",
           width: 100,
-          show:true
+          show: true
         }
       ]
     }
@@ -95,9 +100,9 @@ export default {
   computed: {},
   watch: {},
   created() {
-    console.log('this.$route.params.order_sn:', this.$route.query.order_sn)
-    if(this.$route.query.order_sn) {
-      this.orderNo =this.$route.query.order_sn
+    console.log("this.$route.params.order_sn:", this.$route.query.order_sn)
+    if (this.$route.query.order_sn) {
+      this.orderNo = this.$route.query.order_sn
       this.orderStatus = 1
       this.activeName = "1"
     }
@@ -111,20 +116,29 @@ export default {
         order_status_ex: this.orderStatus,
         ...this.listPage
       }
+      this.tableLoading = true
       getOrderLogisticsList(this.removeEmpty(params)).then(res => {
+        this.tableLoading = false
         this.tableData = res.result.list || []
         this.total = res.result.total
       })
     },
-    handleClick() {},
-        onChangeCheck(arr){
-      this.columns.forEach((item,index)=>{
-        if(arr.includes(item.label)){
+    onReset(){
+      this.orderNo = ''
+      this.loadData()
+    },
+    handleClick(tab) {
+      this.orderStatus = parseInt(tab.name)
+      this.loadData()
+    },
+    onChangeCheck(arr) {
+      this.columns.forEach((item, index) => {
+        if (arr.includes(item.label)) {
           item.show = true
         } else {
           item.show = false
         }
-        this.$set(this.columns,index,item)
+        this.$set(this.columns, index, item)
       })
     }
   }

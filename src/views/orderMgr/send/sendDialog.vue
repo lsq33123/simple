@@ -4,16 +4,19 @@
       <el-form label-width="100px" ref="form1" :model="form" :rules="rules">
         <el-form-item label="OBD序列号" required prop="obd_list">
           <!-- <el-input placeholder="请输入" class="w350" @input="onInput"/> -->
-          <template v-for="(item, index) in obdList">
+          <div v-for="(item, index) in obdList" class="marginb">
             <el-autocomplete
               v-model="item.uuid"
               :fetch-suggestions="inputChange"
               placeholder="请输入OBD"
               :trigger-on-focus="false"
               @select="obj => handleSelect(item, obj)"
-              class="w350 margin"
+              @input="val => onInputUuid(item, val)"
+              :debounce="500"
+              class="w350 "
               max="100"
               clearable
+              highlight-first-item
             />
 
             <div class="mark-icon-wrap" v-if="item.is_bind === 0">
@@ -32,7 +35,11 @@
               <svg-icon icon-class="error" class-name="check-panel-icon" />
               已发货
             </div>
-          </template>
+            <div class="mark-icon-wrap" v-if="iExistObd">
+              <svg-icon icon-class="error" class-name="check-panel-icon" />
+              该OBD不存在
+            </div>
+          </div>
         </el-form-item>
         <el-form-item label="发货方式" prop="logistics_mode">
           <el-radio-group v-model="form.logistics_mode">
@@ -63,8 +70,7 @@
 
 <script>
 import { getExpressCompanyList } from "@/api/common"
-import { addOrderShipment } from "@/api/order"
-import { searchObdList } from "@/api/order"
+import { addOrderShipment, checkObdBindRel, searchObdList } from "@/api/order"
 import { debounce } from "@/utils"
 export default {
   components: {},
@@ -95,6 +101,7 @@ export default {
     return {
       obdList: [],
       currList: [],
+      iExistObd: false,
       form: {
         logistics_mode: 1
       },
@@ -109,17 +116,21 @@ export default {
   },
   computed: {},
   watch: {
-    OBDNum(val) {
-      for (let i = 0; i < this.OBDNum; i++) {
-        this.obdList.push({ id: i, uuid: "", is_bind: "", is_relation_order: "" }) //是否绑定  是否关联订单
-      }
-    },
+    // OBDNum(val) {
+    //   for (let i = 0; i < this.OBDNum; i++) {
+    //     this.obdList.push({ id: i, uuid: "", is_bind: "", is_relation_order: "" }) //是否绑定  是否关联订单
+    //   }
+    // },
     obdList() {
       this.form.obd_list = this.obdList.map(item => item.uuid)
     }
   },
   created() {
     this.initData()
+
+    for (let i = 0; i < this.OBDNum; i++) {
+      this.obdList.push({ id: i, uuid: "", is_bind: "", is_relation_order: "" }) //是否绑定  是否关联订单
+    }
   },
   mounted() {},
   methods: {
@@ -147,9 +158,29 @@ export default {
         cb(this.currList)
       })
     },
+    onInputUuid(item, val) {
+      if (val) {
+        checkObdBindRel({ order_logistics_id: this.orderId, uuid: val }).then(res => {
+          // console.log('res:', res)
+          if (!res.result.data) {
+            this.iExistObd = true
+            item.is_bind = ""
+            item.is_relation_order = ""
+          } else {
+            this.iExistObd = false
+            item.is_bind = res.result.data.is_bind
+            item.is_relation_order = res.result.data.is_relation_order
+          }
+        })
+      } else {
+        this.iExistObd = false
+        item.is_bind = ""
+        item.is_relation_order = ""
+      }
+    },
     handleSelect(item, obj) {
-      item.is_bind = obj.is_bind
-      item.is_relation_order = obj.is_relation_order
+      // item.is_bind = obj.is_bind
+      // item.is_relation_order = obj.is_relation_order
     },
     onSure() {
       const params = { ...this.form }
@@ -192,7 +223,7 @@ export default {
     margin-left: 18px;
   }
 }
-.margin + .margin {
+.marginb + .marginb {
   margin-top: 10px;
 }
 

@@ -98,6 +98,7 @@ import SelOrderStatus from "@/components/SelectInput/selOrderStatus"
 import Setting from "@/components/RightToolbar/setting"
 import {exportCSV} from '@/utils/ruoyi'
 export default {
+  name:'OrderList',
   components: { TableTemplate, SelOrderChannel, SelOrderSource, SelOrderStatus, Setting },
   props: {},
   data() {
@@ -220,6 +221,7 @@ export default {
     },
     onReset() {
       this.$refs.form.resetFields()
+      this.loadData()
     },
     onAdd() {
       this.$router.push("/orderMgr/addOrderList")

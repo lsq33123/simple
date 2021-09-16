@@ -3,6 +3,7 @@ import { Notification, MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
+import {removeEmpty} from '@/utils/ruoyi'
 
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
@@ -21,6 +22,7 @@ service.interceptors.request.use(config => {
   }
   // get请求映射params参数
   if (config.method === 'get' && config.params) {
+    config.params = removeEmpty(removeEmpty) //删除空的属性
     let url = config.url + '?';
     for (const propName of Object.keys(config.params)) {
       const value = config.params[propName];

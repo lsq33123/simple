@@ -1,6 +1,7 @@
 <template>
   <div class="container-wrap">
     <div class="left-wrap ">
+      {{ JSON.stringify(buyer) }}
       <div class="block-wrap ">
         <el-form label-width="120px" ref="form1" :model="buyer" :rules="rules">
           <el-card class="box-card">
@@ -66,19 +67,19 @@
               <el-form-item label="手机号" prop="buyer_phone">
                 <SelPhoneCode v-model="buyer.phone_code_id" class="w200" />
                 <el-input v-model="buyer.buyer_phone" placeholder="请输入手机号" class="w250" @input="onInputPhone" />
-                <div class="mark-icon-wrap" v-if="buyer.isReg === 1">
+                <div class="mark-icon-wrap" v-if="buyer.is_registered === 1">
                   <svg-icon icon-class="check" class-name="check-panel-icon" />
                   已注册
                 </div>
-                <div class="mark-icon-wrap" v-if="buyer.isReg === 0">
+                <div class="mark-icon-wrap" v-if="buyer.is_registered === 0">
                   <svg-icon icon-class="exclamstion" class-name="check-panel-icon" />
                   未注册
                 </div>
-                <div class="mark-icon-wrap" v-if="buyer.isFirst === 1">
+                <div class="mark-icon-wrap" v-if="buyer.is_first === 1">
                   <svg-icon icon-class="check" class-name="check-panel-icon" />
                   首购
                 </div>
-                <div class="mark-icon-wrap" v-if="buyer.isFirst === 0">
+                <div class="mark-icon-wrap" v-if="buyer.is_first === 0">
                   <svg-icon icon-class="exclamstion" class-name="check-panel-icon" />
                   非首购
                 </div>
@@ -102,8 +103,7 @@
               <el-col :span="16">
                 <el-form-item label="手机号" prop="receive.receive_phone">
                   <SelPhoneCode v-model="buyer.receive.phone_code_id" class="w200" />
-                  <el-input v-model="buyer.receive.receive_phone" placeholder="请输入手机号码" class="w250"
-                  @input="v=>buyer.receive.receive_phone = v.replace(/[^\d]/g,'')"/>
+                  <el-input v-model="buyer.receive.receive_phone" placeholder="请输入手机号码" class="w250" @input="v => (buyer.receive.receive_phone = v.replace(/[^\d]/g, ''))" />
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -131,7 +131,7 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="运费(元)" prop="express_price">
-                  <el-input v-model="buyer.express_price" class="w250" :maxlength="6"/>
+                  <el-input v-model="buyer.express_price" class="w250" :maxlength="6" @input="onInputPrice" />
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -146,11 +146,14 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="收款情况" prop="payment_type">
-                  <el-select v-model="buyer.payment_type" class="w125">
+                  <el-select v-model="buyer.payment_type" class="w125" @change="onChangePayment">
                     <el-option label="先款后货" :value="1"> </el-option>
                     <el-option label="先货后款" :value="2"> </el-option>
                   </el-select>
-                  <SelOrderStatus v-model="buyer.total_money" class="w125" />
+                  <el-select v-model="buyer.order_status" class="w125" disabled>
+                    <el-option label="已收款" :value="10"> </el-option>
+                    <el-option label="未收款" :value="0"> </el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -158,17 +161,17 @@
                   <el-date-picker v-model="buyer.pay_time" type="date" placeholder="选择日期" class="w250" />
                 </el-form-item>
               </el-col>
-              <template v-if="buyer.payment_type ===1" >
-              <el-col :span="8" >
-                <el-form-item label="第三方支付单号">
-                  <el-input v-model="buyer.transaction_id" class="w250" :maxlength="100"/>
-                </el-form-item>
-              </el-col>
-              <el-col :span="8">
-                <el-form-item label="图片凭证">
-                  <SingleImg v-model="buyer.pay_voucher" />
-                </el-form-item>
-              </el-col>
+              <template v-if="buyer.payment_type === 1">
+                <el-col :span="8">
+                  <el-form-item label="第三方支付单号">
+                    <el-input v-model="buyer.transaction_id" class="w250" :maxlength="100" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item label="图片凭证">
+                    <SingleImg v-model="buyer.pay_voucher" />
+                  </el-form-item>
+                </el-col>
               </template>
             </el-row>
           </el-card>
@@ -190,18 +193,19 @@
 </template>
 
 <script>
-import { addOrderList, getGoodsList, appUserStatus } from "@/api/order"
+import { addOrderList, getGoodsList, appUserStatus, getOrderDetail } from "@/api/order"
 import { getOrderChannelList } from "@/api/common"
 import SelPhoneCode from "@/components/SelectInput/selPhoneCode"
 import SelAddress from "@/components/SelectInput/selAddress"
 import SelOrderSource from "@/components/SelectInput/selOrderSource"
 import SelPayChannel from "@/components/SelectInput/selPayChannel"
-import SelOrderStatus from "@/components/SelectInput/selOrderStatus"
+// import SelOrderStatus from "@/components/SelectInput/selOrderStatus"
 import SelSalesAgent from "@/components/SelectInput/selSalesAgent"
 import SingleImg from "@/components/Upload/singleImg"
 import { debounce } from "@/utils"
 export default {
-  components: { SelPhoneCode, SelAddress, SelOrderSource, SelPayChannel, SelOrderStatus, SingleImg, SelSalesAgent },
+  name: "addOrderList",
+  components: { SelPhoneCode, SelAddress, SelOrderSource, SelPayChannel, SingleImg, SelSalesAgent },
   props: {},
   data() {
     var validatePass1 = (rule, value, callback) => {
@@ -221,9 +225,10 @@ export default {
       tableData: [{ goods_id: "", actual_price: "" }],
       channelTypeList: [],
       currChannelObj: {},
+      orderId: this.$route.query.orderId,
       buyer: {
-        isFirst: '', //是否首购  1是
-        isReg: '', //是否已注册 1是
+        is_first: "", //是否首购  1是
+        is_registered: "", //是否已注册 1是
         receive: {
           address_area_ids: []
         } //收货信息
@@ -253,12 +258,15 @@ export default {
     }
   },
   watch: {
-    'buyer.buyer_phone'(val){
-      this.buyer.buyer_phone = val.replace(/[^\d]/g,'')
+    "buyer.buyer_phone"(val) {
+      this.buyer.buyer_phone = val.replace(/[^\d]/g, "")
     }
   },
   created() {
     this.initData()
+    if (this.orderId) {
+      this.loadData()
+    }
   },
   mounted() {},
   methods: {
@@ -273,11 +281,81 @@ export default {
         this.channelTypeList = res.result.data
       })
     },
+    loadData() {
+      getOrderDetail({ id: this.orderId }).then(res => {
+        // console.log('res:', res)
+        const data = res.result || {}
+        const goods = data.order_goods.map(item=>{
+          return {
+            goods_id:item.goods_id,
+            count:item.count,
+            actual_price:item.actual_price,
+            stock:item.stock,
+            sales_price:item.sales_price,
+          }
+        })
+        this.tableData = goods
+
+        // let recTemp = {}
+        // if(data.order_receive_info && data.order_receive_info){
+        //   const obj = data.order_logistics[0]
+        //   recTemp = {
+        //     receive_name: data.receive_name,
+        //     receive_phone: data.receive_phone,
+        //     phone_code_id: data.phone_code_id,
+        //     receive_address: data.receive_address,
+        //     province_id: data.province_id,
+        //     address_area: data.address_area,
+        //     address_area_ids: data.address_area_ids
+        //   }
+        // }
+
+        if(data.order_receive_info && data.order_receive_info.address_area_ids) {
+          const arr = data.order_receive_info.address_area_ids.split(',')
+          const arr2 = arr.map(item=> parseInt(item))
+          data.order_receive_info.address_area_ids = arr2
+        }
+
+        this.buyer = {
+          order_sn: data.order_sn,
+          buyer_name: data.buyer_name,
+          phone_code_id: data.phone_code_id,
+          buyer_phone: data.buyer_phone,
+          channel_type: data.channel_type,
+          total_money: data.total_money,
+          payment_money: data.payment_money,
+          express_price: data.express_price,
+          discount_amount: data.discount_amount,
+          payment_type: data.payment_type,
+          pay_channel: data.pay_channel,
+          order_status: data.order_status,
+          pay_time: data.pay_time,
+          transaction_id: data.transaction_id,
+          pay_voucher: data.pay_voucher,
+          // goods: goods,
+          receive: data.order_receive_info,
+          sales_agent_id: data.sales_agent_id,
+          is_registered: data.is_registered,
+          is_first: data.is_first
+        }
+      })
+    },
     addRow() {
       this.tableData.push({ goods_id: "", actual_price: "" })
     },
     detRow(index) {
       this.tableData.splice(index, 1)
+    },
+
+    onChangePayment(val) {
+      if (val === 1) {
+        this.buyer.order_status = 10
+      } else if (val === 2) {
+        this.buyer.order_status = 0
+      }
+    },
+    onInputPrice() {
+      this.onInputNum()
     },
     onInputNum() {
       const total_money = this.tableData.reduce((total, item) => {
@@ -288,7 +366,7 @@ export default {
       }, 0)
 
       this.$set(this.buyer, "total_money", total_money)
-      this.$set(this.buyer, "payment_money", payment_money)
+      this.$set(this.buyer, "payment_money", parseInt(payment_money + parseInt(this.buyer.express_price || 0))) //加上运费
     },
     onChangeGood(row, val) {
       const currGood = this.goodList.find(item => item.id === val)
@@ -313,17 +391,24 @@ export default {
       500,
       false
     ),
-    checkFirstReg(tel) {
-      appUserStatus({ mobile: this.buyer.buyer_phone }).then(res => {
-        this.buyer.isFirst = res.result.is_first_buy
-        this.buyer.isReg = res.result.is_registered
-      })
+    checkFirstReg() {
+      if (this.buyer.buyer_phone) {
+        appUserStatus({ mobile: this.buyer.buyer_phone }).then(res => {
+          this.buyer.is_first = res.result.is_first_buy
+          this.buyer.is_registered = res.result.is_registered
+        })
+      } else {
+        this.buyer.is_first = ""
+        this.buyer.is_registered = ""
+      }
     },
     onSubmit() {
-      const params = {
-        goods: this.tableData || [],
-        ...this.buyer
-      }
+      const params = JSON.parse(
+        JSON.stringify({
+          goods: this.tableData || [],
+          ...this.buyer
+        })
+      )
       console.log("params:", params)
 
       if (params.goods.length <= 0) {
@@ -339,11 +424,22 @@ export default {
           if (params.receive.address_area_ids && params.receive.address_area_ids.length) {
             params.receive.address_area_ids = params.receive.address_area_ids.join(",")
           }
-          console.log("接口调用res:")
-          // addOrderList(params).then(res => {
-          //   // console.log('res:', res)
-          //   this.msgSuccess("订单创建成功")
-          // })
+
+
+          if(this.orderId){
+            //修改
+            editOrderList(params).then(res => {
+              // console.log('res:', res)
+              this.msgSuccess("订单修改成功")
+            })
+
+          } else {
+            //新增
+            addOrderList(params).then(res => {
+              // console.log('res:', res)
+              this.msgSuccess("订单创建成功")
+            })
+          }
         } else {
           this.msgWarning("请完善相关信息")
         }

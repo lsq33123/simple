@@ -1,5 +1,5 @@
 <template>
-  <div class="table-wrap">
+  <div class="table-wrap" :loading="loading">
     <div class="title-wrap">
       <div v-for="(item, index) in columns" :key="index" v-show="item.show"  class="title-item-wrap" :style="{ 'min-width': item.width + 'px' }">
         <!-- <span v-if=""></span> -->
@@ -77,8 +77,8 @@
                 <div class="other-cell flex-c child-cell-item" v-for="(list, lindex) in good.logistics_list" :key="lindex">
                   <div style="line-height:30px" v-if="list.sub_goods_type === 1">
                     <span class="text-btn mr10" @click="onDetail(list)">详情</span>
-                    <span class="text-btn mr10" @click="onSend(list.order_logistics_id,good.goods_count,list.sub_goods_count)" >发货</span>
-                    <!-- <span class="text-btn mr10" @click="onSend(list.order_logistics_id,good.goods_count,list.sub_goods_count)" v-if="list.order_status ===10 || list.order_status ===20">发货</span> -->
+                    <!-- <span class="text-btn mr10" @click="onSend(list.order_logistics_id,good.goods_count,list.sub_goods_count)" >发货</span> -->
+                    <span class="text-btn mr10" @click="onSend(list.order_logistics_id,good.goods_count,list.sub_goods_count)" v-if="list.logistics_state === 0 && list.sub_goods_type === 1">发货</span>
                   </div>
                 </div>
               </div>
@@ -92,7 +92,7 @@
         </div>
       </div>
     </div>
-    <SendDialog :OBDNum="OBDNum"  :orderId="currOrderId" :isShow.sync="isShowSend" @reload="reload"/>
+    <SendDialog :OBDNum="OBDNum"  :orderId="currOrderId" :isShow.sync="isShowSend" v-if="isShowSend" @reload="reload"/>
     <SendDetDrawer ref="sendDet" :isShow.sync="isShowSendDet" />
   </div>
 </template>
@@ -109,9 +109,13 @@ export default {
       type: Array,
       default: () => []
     },
-        columns: {
+    columns: {
       type: Array,
       default: () => []
+    },
+    loading: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
