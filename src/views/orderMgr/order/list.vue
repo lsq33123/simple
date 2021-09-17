@@ -41,7 +41,7 @@
             </el-col>
             <el-col :span="7">
               <el-form-item label="渠道类型" prop="channel_type">
-                <SelOrderChannel v-model="form.channel_type" size="small" class="w250" showAll filterable clearable @change="onChange" />
+                <SelOrderChannel v-model="form.channel_type" :params="{type:'all'}" size="small" class="w250" showAll filterable clearable @change="onChange" />
               </el-form-item>
             </el-col>
             <el-col :span="21">

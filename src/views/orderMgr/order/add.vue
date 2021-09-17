@@ -1,7 +1,8 @@
 <template>
   <div class="container-wrap">
     <div class="left-wrap ">
-      {{ JSON.stringify(buyer) }}
+      <!-- {{ JSON.stringify(buyer) }} -->
+      <!-- {{ JSON.stringify(tableData) }} -->
       <div class="block-wrap ">
         <el-form label-width="120px" ref="form1" :model="buyer" :rules="rules">
           <el-card class="box-card">
@@ -25,19 +26,19 @@
 
               <el-table-column label="实收金额(元)" min-width="150">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.actual_price" class="w200" @input="onInputNum" />
+                  <el-input v-model="scope.row.actual_price" class="w200" @input="val => onInputNum(scope.row, val, 'actual_price', scope.$index)" maxlength="6" />
                 </template>
               </el-table-column>
 
               <el-table-column label="商品数量" min-width="150">
                 <template slot-scope="scope">
-                  <el-input-number v-model="scope.row.count" controls-position="right" :min="1" @input="onInputNum" />
+                  <el-input v-model="scope.row.count" class="w200" @input="val => onInputNum(scope.row, val, 'count', scope.$index)" />
                 </template>
               </el-table-column>
 
               <el-table-column label="操作" width="100">
                 <template slot-scope="scope">
-                  <i class="el-icon-delete table-delete-btn" @click="detRow(scope.$index)"></i>
+                  <i class="el-icon-delete table-delete-btn" :class="{ disabled: scope.$index === 0 }" @click="detRow(scope.$index)"></i>
                 </template>
               </el-table-column>
             </el-table>
@@ -161,18 +162,19 @@
                   <el-date-picker v-model="buyer.pay_time" type="date" placeholder="选择日期" class="w250" />
                 </el-form-item>
               </el-col>
-              <template v-if="buyer.payment_type === 1">
-                <el-col :span="8">
-                  <el-form-item label="第三方支付单号">
-                    <el-input v-model="buyer.transaction_id" class="w250" :maxlength="100" />
-                  </el-form-item>
-                </el-col>
-                <el-col :span="8">
-                  <el-form-item label="图片凭证">
-                    <SingleImg v-model="buyer.pay_voucher" />
-                  </el-form-item>
-                </el-col>
-              </template>
+            </el-row>
+            <el-row v-if="buyer.payment_type === 1">
+              <el-col :span="8">
+                <el-form-item label="第三方支付单号">
+                  <el-input v-model="buyer.transaction_id" class="w250" :maxlength="100" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="8">
+                <el-form-item label="图片凭证">
+                  <!-- {{ JSON.stringify(buyer.pay_voucher_host +  buyer.pay_voucher) }} -->
+                  <SingleImg v-model="buyer.pay_voucher" :imgAllUrl="buyer.pay_voucher_host + buyer.pay_voucher" />
+                </el-form-item>
+              </el-col>
             </el-row>
           </el-card>
         </el-form>
@@ -193,7 +195,7 @@
 </template>
 
 <script>
-import { addOrderList, getGoodsList, appUserStatus, getOrderDetail } from "@/api/order"
+import { addOrderList, getGoodsList, appUserStatus, getOrderDetail, editOrderList } from "@/api/order"
 import { getOrderChannelList } from "@/api/common"
 import SelPhoneCode from "@/components/SelectInput/selPhoneCode"
 import SelAddress from "@/components/SelectInput/selAddress"
@@ -222,7 +224,7 @@ export default {
 
     return {
       goodList: [],
-      tableData: [{ goods_id: "", actual_price: "" }],
+      tableData: [{ goods_id: "", actual_price: "", count: "" }],
       channelTypeList: [],
       currChannelObj: {},
       orderId: this.$route.query.orderId,
@@ -285,13 +287,13 @@ export default {
       getOrderDetail({ id: this.orderId }).then(res => {
         // console.log('res:', res)
         const data = res.result || {}
-        const goods = data.order_goods.map(item=>{
+        const goods = data.order_goods.map(item => {
           return {
-            goods_id:item.goods_id,
-            count:item.count,
-            actual_price:item.actual_price,
-            stock:item.stock,
-            sales_price:item.sales_price,
+            goods_id: item.goods_id,
+            count: item.count,
+            actual_price: item.actual_price,
+            stock: item.stock,
+            sales_price: item.sales_price
           }
         })
         this.tableData = goods
@@ -310,9 +312,9 @@ export default {
         //   }
         // }
 
-        if(data.order_receive_info && data.order_receive_info.address_area_ids) {
-          const arr = data.order_receive_info.address_area_ids.split(',')
-          const arr2 = arr.map(item=> parseInt(item))
+        if (data.order_receive_info && data.order_receive_info.address_area_ids) {
+          const arr = data.order_receive_info.address_area_ids.split(",")
+          const arr2 = arr.map(item => parseInt(item))
           data.order_receive_info.address_area_ids = arr2
         }
 
@@ -332,6 +334,7 @@ export default {
           pay_time: data.pay_time,
           transaction_id: data.transaction_id,
           pay_voucher: data.pay_voucher,
+          pay_voucher_host: data.pay_voucher_host,
           // goods: goods,
           receive: data.order_receive_info,
           sales_agent_id: data.sales_agent_id,
@@ -341,10 +344,12 @@ export default {
       })
     },
     addRow() {
-      this.tableData.push({ goods_id: "", actual_price: "" })
+      this.tableData.push({ goods_id: "", actual_price: "", count: "" })
     },
     detRow(index) {
-      this.tableData.splice(index, 1)
+      if (index) {
+        this.tableData.splice(index, 1)
+      }
     },
 
     onChangePayment(val) {
@@ -354,10 +359,25 @@ export default {
         this.buyer.order_status = 0
       }
     },
-    onInputPrice() {
-      this.onInputNum()
+    onInputNum(row, val, type, index) {
+      row[type] = val.replace(/[^\d]/g, "")
+      if (type === "actual_price") {
+      }
+      if (type === "count") {
+        // val = parseInt(val) //转化位数字
+        if (val > row.stock) {
+          row[type] = parseInt(row.stock)
+        } else if (val < 1) {
+          row[type] = 1
+        }
+          // this.$set(row,type,row[type])
+      }
+      this.onNum()
     },
-    onInputNum() {
+    onInputPrice() {
+      this.onNum()
+    },
+    onNum() {
       const total_money = this.tableData.reduce((total, item) => {
         return total + (item.sales_price || 0) * (item.count || 0)
       }, 0)
@@ -425,23 +445,34 @@ export default {
             params.receive.address_area_ids = params.receive.address_area_ids.join(",")
           }
 
-
-          if(this.orderId){
+          if (this.orderId) {
             //修改
             editOrderList(params).then(res => {
               // console.log('res:', res)
               this.msgSuccess("订单修改成功")
+              this.closeCurrPage()
             })
-
           } else {
             //新增
             addOrderList(params).then(res => {
               // console.log('res:', res)
               this.msgSuccess("订单创建成功")
+              this.closeCurrPage()
             })
           }
         } else {
           this.msgWarning("请完善相关信息")
+        }
+      })
+    },
+    closeCurrPage() {
+      let view = this.$router.history.current
+      this.$store.dispatch("tagsView/delView", view).then(({ visitedViews }) => {
+        if (window.history.length <= 1) {
+          this.$router.push({ path: "/orderMgr/orderList" })
+          return false
+        } else {
+          this.$router.go(-1)
         }
       })
     }
@@ -519,5 +550,9 @@ export default {
 }
 .w125 {
   width: 125px !important;
+}
+.disabled {
+  color: #c0c4cc;
+  cursor: not-allowed;
 }
 </style>

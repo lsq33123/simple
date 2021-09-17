@@ -14,7 +14,11 @@ export default {
     showAll: {
       type: Boolean,
       default: false
-    }
+    },
+    params: {
+      type: Object,
+      default: ()=>{}
+    },
   },
   inheritAttrs: false,
   data() {
@@ -36,7 +40,7 @@ export default {
   mounted() {},
   methods: {
     loadData() {
-      getOrderChannelList({ page: 1, page_size: 100 }).then(res => {
+      getOrderChannelList({ page: 1, page_size: 100 ,...this.params}).then(res => {
         // console.log('res:', res)
         this.options = res.result.data
       })

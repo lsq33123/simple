@@ -9,22 +9,23 @@
       :on-exceed="handleExceed"
       :before-upload="beforeUpload"
       :headers="headerObj"
+      :file-list="imgFilesList"
       list-type="picture-card"
       class="avatar-uploader"
       :class="{ disabled: uploadDisabled }"
     >
-      <!-- <img v-if="imgUrl" :src="imgUrl" class="avatar" /> -->
+      <!-- <img v-if="imgAllUrl" :src="imgAllUrl" class="avatar" /> -->
       <i class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
     <el-dialog :visible.sync="dialogVisible">
-      <img width="100%" :src="imgUrl" alt="图片未找到" />
+      <img width="100%" :src="imgAllUrl" alt="图片未找到" />
     </el-dialog>
   </div>
 </template>
 
 <script>
 // import { } from '@/api'
-import { getToken } from '@/utils/auth'
+import { getToken } from "@/utils/auth"
 export default {
   components: {},
   model: {
@@ -35,6 +36,10 @@ export default {
     imgUrl: {
       type: String,
       default: ""
+    },
+    imgAllUrl: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -42,13 +47,39 @@ export default {
       rootUrl: process.env.VUE_APP_BASE_API + "/uploadImage",
       dialogVisible: false,
       uploadDisabled: false,
-      headerObj:{
-        "x-access-token":getToken()
+      headerObj: {
+        "x-access-token": getToken()
       }
     }
   },
-  computed: {},
-  watch: {},
+  computed: {
+    imgFilesList() {
+      let arr = []
+      if (this.imgAllUrl) {
+        arr = [
+          {
+            url: this.imgAllUrl,
+            name: "图片1",
+            id: 1
+          }
+        ]
+      }
+      return arr
+    }
+  },
+  watch: {
+    imgFilesList: {
+      handler(val) {
+        if (val.length) {
+          this.uploadDisabled = true
+        } else {
+          this.uploadDisabled = false
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
   created() {},
   mounted() {},
   methods: {
@@ -99,17 +130,21 @@ export default {
 .avatar-uploader .el-upload:hover {
   border-color: #409eff;
 }
+.avatar-uploader /deep/ .el-upload--picture-card {
+  width: 146px;
+  height: 146px;
+}
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 99px;
-  height: 99px;
-  line-height: 99px;
+  width: 146px;
+  height: 146px;
+  line-height: 146px;
   text-align: center;
 }
 .avatar {
-  width: 99px;
-  height: 99px;
+  width: 146px;
+  height: 146px;
   display: block;
 }
 
