@@ -2,7 +2,7 @@
   <div class="container-wrap">
     <div class="left-wrap ">
       <!-- {{ JSON.stringify(buyer) }} -->
-      <!-- {{ JSON.stringify(tableData) }} -->
+      <!-- {{ JSON.stringify(tableData) }}  1-->
       <div class="block-wrap ">
         <el-form label-width="120px" ref="form1" :model="buyer" :rules="rules">
           <el-card class="box-card">
