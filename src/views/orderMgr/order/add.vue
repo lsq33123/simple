@@ -263,7 +263,7 @@ export default {
       this.buyer.buyer_phone = val.replace(/[^\d]/g, "")
     },
     "buyer.express_price"(val) {
-      this.buyer.buyer_phone =   val.replace(/[^\d.]/g, "")
+      this.buyer.express_price =   val.replace(/[^\d.]/g, "")
     }
   },
   created() {
@@ -401,6 +401,7 @@ export default {
         row.actual_price = currGood.sales_price
         row.count = 1
       }
+      this.onNum()
     },
     onChangeChannelType(val) {
       if (val) {

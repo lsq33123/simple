@@ -3,7 +3,7 @@ import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
-import { getToken } from '@/utils/auth'
+import { getTokenLocal } from '@/utils/auth'
 
 NProgress.configure({ showSpinner: false })
 
@@ -13,7 +13,7 @@ const whiteList = ['/login', '/auth-redirect', '/bind', '/register','/test1']
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
-  if (getToken()) {
+  if (getTokenLocal()) {
     to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
     /* has token*/
     if (to.path === '/login') {
@@ -52,7 +52,7 @@ router.beforeEach((to, from, next) => {
 
 
   // NProgress.start()
-  // if (getToken()) {
+  // if (getTokenLocal()) {
   //   next()
   // } else {
   //   // 没有token

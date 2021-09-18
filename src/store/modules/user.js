@@ -1,11 +1,11 @@
 import { login, logout, getInfo } from '@/api/login'
 import { getVerifySmsCode } from '@/api/login'
 
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getTokenLocal, setTokenLocal, removeToken, removeTokenLocal } from '@/utils/auth'
 
 const user = {
   state: {
-    token: getToken(),
+    token: getTokenLocal(),
     name: '',
     avatar: '',
     roles: [],
@@ -39,7 +39,7 @@ const user = {
       return new Promise((resolve, reject) => {
         getVerifySmsCode({ mobile: username, code: code }).then(res => {
 
-          setToken(res.result.token)
+          setTokenLocal(res.result.token)
           commit('SET_TOKEN', res.result.token)
           resolve()
         }).catch(error => {
@@ -76,6 +76,7 @@ const user = {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           commit('SET_PERMISSIONS', [])
+          removeTokenLocal()
           removeToken()
           resolve()
         // }).catch(error => {
@@ -88,6 +89,7 @@ const user = {
     FedLogOut({ commit }) {
       return new Promise(resolve => {
         commit('SET_TOKEN', '')
+        removeTokenLocal()
         removeToken()
         resolve()
       })

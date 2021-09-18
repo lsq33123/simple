@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { getToken } from "@/utils/auth";
+import { getTokenLocal } from "@/utils/auth";
 
 export default {
   props: {
@@ -76,7 +76,7 @@ export default {
       baseUrl: process.env.VUE_APP_BASE_API,
       uploadImgUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传的图片服务器地址
       headers: {
-        Authorization: "Bearer " + getToken(),
+        Authorization: "Bearer " + getTokenLocal(),
       },
       fileList: []
     };

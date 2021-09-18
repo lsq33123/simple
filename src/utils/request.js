@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { Notification, MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import { getTokenLocal } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import {removeEmpty} from '@/utils/ruoyi'
 
@@ -17,8 +17,8 @@ const service = axios.create({
 service.interceptors.request.use(config => {
   // 是否需要设置 token
   const isToken = (config.headers || {}).isToken === false
-  if (getToken() && !isToken) {
-    config.headers['x-access-token'] =  getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+  if (getTokenLocal() && !isToken) {
+    config.headers['x-access-token'] =  getTokenLocal() // 让每个请求携带自定义token 请根据实际情况自行修改
   }
   // get请求映射params参数
   if (config.method === 'get' && config.params) {

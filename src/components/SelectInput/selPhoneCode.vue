@@ -1,7 +1,7 @@
 <template>
     <el-select  v-on="$listeners" v-bind="customAttrs">
       <el-option v-for="item in options" :key="item.id" :label="`${item.chinese_name}(+${item.phone_code})`" :value="item.id">
-        {{`${item.chinese_name}(${item.phone_code})`}}
+        {{`${item.chinese_name}(+${item.phone_code})`}}
          </el-option>
     </el-select>
 </template>

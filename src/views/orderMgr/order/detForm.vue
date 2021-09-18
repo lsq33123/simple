@@ -131,6 +131,7 @@
           <el-col :span="6">
             <!-- <el-form-item label="图片凭证"> {{form.pay_voucher}}</el-form-item> -->
             <el-form-item label="图片凭证">
+               <!-- {{form.pay_voucher}} -->
               <span v-if="form.pay_voucher" class="text-btn" @click="onShowIUmg(form.pay_voucher)">点击查看</span>
               </el-form-item>
           </el-col>

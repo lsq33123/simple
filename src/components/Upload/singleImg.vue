@@ -25,7 +25,7 @@
 
 <script>
 // import { } from '@/api'
-import { getToken } from "@/utils/auth"
+import { getTokenLocal } from "@/utils/auth"
 export default {
   components: {},
   model: {
@@ -48,7 +48,7 @@ export default {
       dialogVisible: false,
       uploadDisabled: false,
       headerObj: {
-        "x-access-token": getToken()
+        "x-access-token": getTokenLocal()
       }
     }
   },

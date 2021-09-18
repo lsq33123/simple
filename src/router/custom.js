@@ -34,24 +34,24 @@ export const customRoutes = [
         name: 'OrderList',
         meta: { title: '订单列表', icon: 'build' }
       },
-      {
-        path: '/orderMgr/addOrderList',
-        component: (resolve) => require(['@/views/orderMgr/order/add'], resolve),
-        name: 'addOrderList',
-        meta: { title: '创建订单', icon: 'build' ,noCache: false  }
-      },
-      {
-        path: '/orderMgr/editOrderList',
-        component: (resolve) => require(['@/views/orderMgr/order/add'], resolve),
-        name: 'editOrderList',
-        meta: { title: '编辑订单', icon: 'build' }
-      },
-      {
-        path: '/orderMgr/orderDet',
-        component: (resolve) => require(['@/views/orderMgr/order/det'], resolve),
-        name: 'OrderDet',
-        meta: { title: '订单详情', icon: 'build' }
-      },
+      // {
+      //   path: '/orderMgr/addOrderList',
+      //   component: (resolve) => require(['@/views/orderMgr/order/add'], resolve),
+      //   name: 'addOrderList',
+      //   meta: { title: '创建订单', icon: 'build' ,noCache: false  }
+      // },
+      // {
+      //   path: '/orderMgr/editOrderList',
+      //   component: (resolve) => require(['@/views/orderMgr/order/add'], resolve),
+      //   name: 'editOrderList',
+      //   meta: { title: '编辑订单', icon: 'build' }
+      // },
+      // {
+      //   path: '/orderMgr/orderDet',
+      //   component: (resolve) => require(['@/views/orderMgr/order/det'], resolve),
+      //   name: 'OrderDet',
+      //   meta: { title: '订单详情', icon: 'build' }
+      // },
       {
         path: '/orderMgr/sendList',
         component: (resolve) => require(['@/views/orderMgr/send/list'], resolve),
