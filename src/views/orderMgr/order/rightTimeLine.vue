@@ -49,8 +49,8 @@ export default {
     onDetail(item){
       this.isShowDetail = true
       this.form ={
-        ...item.order_Info,
-        receive_info: item.receive_info,
+        ...item.order_info,
+        order_receive_info: item.order_receive_info,
         order_goods:item.order_goods,
         order_logistics:item.order_logistics,
       }

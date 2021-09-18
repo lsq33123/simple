@@ -14,11 +14,11 @@
       class="avatar-uploader"
       :class="{ disabled: uploadDisabled }"
     >
-      <!-- <img v-if="imgAllUrl" :src="imgAllUrl" class="avatar" /> -->
+      <!-- <img v-if="imgUrl" :src="imgUrl" class="avatar" /> -->
       <i class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
     <el-dialog :visible.sync="dialogVisible">
-      <img width="100%" :src="imgAllUrl" alt="图片未找到" />
+      <img width="100%" :src="imgUrl" alt="图片未找到" />
     </el-dialog>
   </div>
 </template>
@@ -55,10 +55,10 @@ export default {
   computed: {
     imgFilesList() {
       let arr = []
-      if (this.imgAllUrl) {
+      if (this.imgUrl) {
         arr = [
           {
-            url: this.imgAllUrl,
+            url: this.imgUrl,
             name: "图片1",
             id: 1
           }
@@ -85,7 +85,7 @@ export default {
   methods: {
     handleSuccess(res, file) {
       this.uploadDisabled = true
-      this.$emit("onBindValue", res.result.path)
+      this.$emit("onBindValue", res.result.url)
       this.$emit("handleSuccess", { res, file })
     },
     handleRemove(file, fileList) {
@@ -98,7 +98,7 @@ export default {
       this.$message.warning("上传图片不能超过1张!")
     },
     handlePreview(file) {
-      this.dialogImageUrl = file.response.result.path
+      // this.dialogImageUrl = file.response.result.path
       this.dialogVisible = true
       this.uploadDisabled = true
     },
@@ -106,7 +106,7 @@ export default {
       const isPNG = file.type === "image/png"
       const isJPG = file.type === "image/jpeg"
       const isLt2M = file.size / 1024 / 1024 < 2
-
+      this.uploadDisabled = true
       if (!isJPG && !isPNG) {
         this.$message.error("上传图片只能是 JPG/PNG 格式")
       }

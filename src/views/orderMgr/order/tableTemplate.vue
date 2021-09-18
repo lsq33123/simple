@@ -58,7 +58,7 @@
                 <span class="text-btn mr10" @click="onRemark(item.order_sn)">备注</span>
                 <span class="text-btn mr10" @click="onSend(item.order_sn)" v-if="item.order_status ===10 || item.order_status ===20">发货</span>
                 <span class="text-btn mr10" @click="onCancel(item.order_sn)" v-if="item.order_type ===1 &&  item.order_status === 0">取消订单</span>
-                <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999" @click="onEdit(item.id)">编辑</span>
+                <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999 && item.order_type ===2" @click="onEdit(item.id)">编辑</span>
                 <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999">发起售后</span>
                 <span class="text-btn mr10" @click="onHistory(item.order_sn)">操作历史</span>
               </div>

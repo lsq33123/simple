@@ -26,7 +26,7 @@
 
               <el-table-column label="实收金额(元)" min-width="150">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.actual_price" class="w200" @input="val => onInputNum(scope.row, val, 'actual_price', scope.$index)" maxlength="6" />
+                  <el-input v-model="scope.row.actual_price" class="w200" @input="val => onInputNum(scope.row, val, 'actual_price', scope.$index)"  maxlength="8"/>
                 </template>
               </el-table-column>
 
@@ -132,7 +132,7 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="运费(元)" prop="express_price">
-                  <el-input v-model="buyer.express_price" class="w250" :maxlength="6" @input="onInputPrice" />
+                  <el-input v-model="buyer.express_price" class="w250" :maxlength="8" @input="onInputPrice" />
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -171,8 +171,7 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="图片凭证">
-                  <!-- {{ JSON.stringify(buyer.pay_voucher_host +  buyer.pay_voucher) }} -->
-                  <SingleImg v-model="buyer.pay_voucher" :imgAllUrl="buyer.pay_voucher_host + buyer.pay_voucher" />
+                  <SingleImg v-model="buyer.pay_voucher" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -262,6 +261,9 @@ export default {
   watch: {
     "buyer.buyer_phone"(val) {
       this.buyer.buyer_phone = val.replace(/[^\d]/g, "")
+    },
+    "buyer.express_price"(val) {
+      this.buyer.buyer_phone =   val.replace(/[^\d.]/g, "")
     }
   },
   created() {
@@ -360,10 +362,13 @@ export default {
       }
     },
     onInputNum(row, val, type, index) {
-      row[type] = val.replace(/[^\d]/g, "")
       if (type === "actual_price") {
+        row[type] = val.replace(/[^\d.]/g, "")//清除"数字"和"."以外的字符
+        // row[type] =  parseFloat(row[type]).toFixed(2)
+        // row[type] =  val.match(/^\d{1,6}(\.\d{1,2})$/g)[0] || null;
       }
       if (type === "count") {
+        row[type] = val.replace(/[^\d]/g, "")
         // val = parseInt(val) //转化位数字
         if (val > row.stock) {
           row[type] = parseInt(row.stock)
@@ -386,7 +391,7 @@ export default {
       }, 0)
 
       this.$set(this.buyer, "total_money", total_money)
-      this.$set(this.buyer, "payment_money", parseInt(payment_money + parseInt(this.buyer.express_price || 0))) //加上运费
+      this.$set(this.buyer, "payment_money", parseFloat(payment_money + parseFloat(this.buyer.express_price || 0))) //加上运费
     },
     onChangeGood(row, val) {
       const currGood = this.goodList.find(item => item.id === val)

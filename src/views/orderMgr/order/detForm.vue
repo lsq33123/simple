@@ -21,7 +21,7 @@
         </el-row>
         <el-row>
           <el-col :span="6">
-            <el-form-item label="订单状态"> {{form.order_status}}</el-form-item>
+            <el-form-item label="订单状态"> {{form.order_status_name}}</el-form-item>
           </el-col>
           <el-col :span="6">
             <el-form-item label="售后状态"> {{form.itemttttttttttt}}</el-form-item>
