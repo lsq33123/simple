@@ -122,7 +122,7 @@ export default {
         {
           label: "商品",
           prop: "goods_name",
-          width: 200,
+          width: 300,
           show: true
         },
         {
@@ -159,7 +159,7 @@ export default {
         {
           label: "收货信息",
           prop: "v9",
-          width: 100,
+          width: 150,
           show: true
         },
         {

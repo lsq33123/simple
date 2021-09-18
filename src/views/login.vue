@@ -18,7 +18,7 @@
         </el-input>
         <div class="login-code">
           <!-- <img :src="codeUrl" @click="getCode" class="login-code-img" /> -->
-          <el-button :loading="codeLoading" @click="getCode">获取验证码</el-button>
+          <el-button :loading="codeLoading" @click="getCode" :disabled="!isGetCode">{{ getTimeText }}</el-button>
         </div>
       </el-form-item>
       <!-- <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox> -->
@@ -40,10 +40,10 @@
 </template>
 
 <script>
-import { getCodeImg } from "@/api/login";
-import { sendSmsCode } from "@/api/login";
-import Cookies from "js-cookie";
-import { encrypt, decrypt } from "@/utils/jsencrypt";
+import { getCodeImg } from "@/api/login"
+import { sendSmsCode } from "@/api/login"
+import Cookies from "js-cookie"
+import { encrypt, decrypt } from "@/utils/jsencrypt"
 
 export default {
   name: "Login",
@@ -64,65 +64,92 @@ export default {
         code: [{ required: true, trigger: "change", message: "请输入验证码" }]
       },
       loading: false,
-      codeLoading:false,
+      codeLoading: false,
       // 验证码开关
       captchaOnOff: true,
       // 注册开关
       register: false,
-      redirect: undefined
-    };
+      redirect: undefined,
+      getTimeText: "获取验证码", //获取验证码按钮文本
+      isGetCode: true //是否可以获取验证码
+    }
   },
   watch: {
     $route: {
       handler: function(route) {
-        this.redirect = route.query && route.query.redirect;
+        this.redirect = route.query && route.query.redirect
       },
       immediate: true
     }
   },
   created() {
-    this.getCookie();
+    this.getCookie()
   },
   methods: {
     getCode() {
-      this.codeLoading = true
+      this.timedown(30)
+      // this.codeLoading = true
       sendSmsCode({mobile:this.loginForm.username}).then(res => {
         if(res.errcode === 0){
           this.msgSuccess('验证码已发送~')
         }
-        this.codeLoading = false
+        // this.codeLoading = false
       }).catch(err=>{
         this.msgError('验证码发送失败~')
-        this.codeLoading = false
+        // this.codeLoading = false
+        this.getTimeText = "重新发送"
+        this.isGetCode = true
       })
+      
     },
     getCookie() {
-      const username = Cookies.get("username");
-      const password = Cookies.get("password");
-      const rememberMe = Cookies.get("rememberMe");
+      const username = Cookies.get("username")
+      const password = Cookies.get("password")
+      const rememberMe = Cookies.get("rememberMe")
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
         password: password === undefined ? this.loginForm.password : decrypt(password),
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
-      };
+      }
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true;
-          Cookies.set("username", this.loginForm.username, { expires: 30 });
-          this.$store.dispatch("Login", this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
-          }).catch(() => {
-            this.loading = false;
-            this.msgError('登录失败')
-          });
+          this.loading = true
+          Cookies.set("username", this.loginForm.username, { expires: 30 })
+          this.$store
+            .dispatch("Login", this.loginForm)
+            .then(() => {
+              this.$router.push({ path: this.redirect || "/" }).catch(() => {})
+            })
+            .catch(() => {
+              this.loading = false
+              this.msgError("登录失败")
+            })
         }
-      });
+      })
       // this.$router.push({ path: this.redirect || "/" }).catch(() => {});
+    },
+    timedown(time) {
+      if (time == "undefined") {
+        time = 60
+      }
+      time = time - 1
+      if (time >= 0) {
+        const that = this
+        setTimeout(function() {
+          that.timedown(time)
+        }, 1000)
+        this.getTimeText = "重新发送("+time + 's)'
+        this.isGetCode = false
+      } else {
+        //倒计时结束
+        this.getTimeText = "重新发送"
+        this.isGetCode = true
+      }
     }
   }
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
@@ -171,7 +198,8 @@ export default {
     vertical-align: middle;
   }
   button {
-    padding: 11px 20px;
+    padding: 11px 10px;
+    width: 100%;
   }
 }
 .el-login-footer {
