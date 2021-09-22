@@ -35,7 +35,7 @@
               <svg-icon icon-class="error" class-name="check-panel-icon" />
               已发货
             </div>
-            <div class="mark-icon-wrap" v-if="iExistObd">
+            <div class="mark-icon-wrap" v-if="item.is_exist_obd === 0">
               <svg-icon icon-class="error" class-name="check-panel-icon" />
               该OBD不存在
             </div>
@@ -101,7 +101,6 @@ export default {
     return {
       obdList: [],
       currList: [],
-      iExistObd: false,
       form: {
         logistics_mode: 1
       },
@@ -129,7 +128,7 @@ export default {
     this.initData()
 
     for (let i = 0; i < this.OBDNum; i++) {
-      this.obdList.push({ id: i, uuid: "", is_bind: "", is_relation_order: "" }) //是否绑定  是否关联订单
+      this.obdList.push({ id: i, uuid: "", is_bind: "", is_relation_order: "",is_exist_obd:1 }) //是否绑定  是否关联订单
     }
   },
   mounted() {},
@@ -163,17 +162,17 @@ export default {
         checkObdBindRel({ order_logistics_id: this.orderId, uuid: val }).then(res => {
           // console.log('res:', res)
           if (!res.result.data) {
-            this.iExistObd = true
+            item.is_exist_obd = 0
             item.is_bind = ""
             item.is_relation_order = ""
           } else {
-            this.iExistObd = false
+            item.is_exist_obd = 1
             item.is_bind = res.result.data.is_bind
             item.is_relation_order = res.result.data.is_relation_order
           }
         })
       } else {
-        this.iExistObd = false
+        item.is_exist_obd = 0
         item.is_bind = ""
         item.is_relation_order = ""
       }

@@ -4,7 +4,7 @@
           <el-timeline-item v-for="(item,index) in timeLineArr" :key="index">
             <p class="el-timeline-item-title">
               {{item.operation_name}}
-              <span class="text-btn ml20" v-if="item.operation_type === 'create_order' || item.operation_type === 'create_order'" @click="onDetail(item)">详情</span>
+              <span class="text-btn ml20" v-if="item.operation_type === 'create_order' || item.operation_type === 'edit_order'" @click="onDetail(item)">详情</span>
               </p>
             <el-card>
               <h4>{{item.operator}} </h4>

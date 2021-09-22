@@ -3,6 +3,7 @@
     <div class="left-wrap ">
       <!-- {{ JSON.stringify(buyer) }} -->
       <!-- {{ JSON.stringify(tableData) }}  1-->
+      <!-- {{ JSON.stringify(disabledEdit) }} <br/> -->
       <div class="block-wrap ">
         <el-form label-width="120px" ref="form1" :model="buyer" :rules="rules">
           <el-card class="box-card">
@@ -226,6 +227,7 @@ export default {
       tableData: [{ goods_id: "", actual_price: "", count: "" }],
       channelTypeList: [],
       currChannelObj: {},
+      disabledEdit: false,  //是否可以编辑
       orderId: this.$route.query.orderId,
       buyer: {
         is_first: "", //是否首购  1是
@@ -256,10 +258,6 @@ export default {
     isNeedAgent() {
       //是否要填入代理商
       return this.currChannelObj.order_type === 3
-    },
-    disabledEdit() {
-      //是否可以编辑
-      return this.buyer.order_status === 30
     },
     isOrderStatusEdit() {
       //是否可以编辑
@@ -350,6 +348,10 @@ export default {
           sales_agent_id: data.sales_agent_id,
           is_registered: data.is_registered,
           is_first: data.is_first
+        }
+
+        if(this.buyer.order_status === 30){
+          this.disabledEdit = true
         }
 
         if(this.buyer.order_status === 20 || this.buyer.order_status === 30) {
