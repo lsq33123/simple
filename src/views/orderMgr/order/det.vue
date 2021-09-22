@@ -2,7 +2,7 @@
   <div class="pb50">
     <el-row>
       <el-col :span="18" class="p20">
-        <DetForm :form="form"/>
+        <DetForm :form="form" />
       </el-col>
       <el-col :span="6">
         <RightTimeLine ref="rightTimeLine" @onDet="onDet"  />
@@ -11,7 +11,7 @@
 
     <div class="bottom-bar-wrap flex-cc fixed-footer">
       <el-button type="" size="small" class="w100" @click="isShowRemark = true">备 注</el-button>
-      <el-button type="" size="small" class="w100">取消售后</el-button>
+      <!-- <el-button type="" size="small" class="w100">取消售后</el-button> -->
     </div>
 
     <OrderDetDialog :isShow.sync="isShowLine"/>

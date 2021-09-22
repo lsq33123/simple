@@ -23,12 +23,12 @@
                 <div class="flex-c wp100 hp100 ">
                   <div class="flex-c flex1 child-cell child-cell-item">
                     <img :src="good.goods_picture_url" />
-                    <span class="color-blue ml10">{{ good.goods_name }}</span>
+                    <span class="color-blue ml10 line-num">{{ good.goods_name }}</span>
                   </div>
                   <div v-if="good.has_sub_goods" class="flex1 bl child-cell">
                     <div class="flex-c ptb10 child-cell-item" v-for="(list, lindex) in good.logistics_list" :key="lindex">
                       <img :src="list.sub_goods_picture_url" />
-                      <span class="color-blue ml10">{{ list.sub_goods_name }}</span>
+                      <span class="color-blue ml10 line-num">{{ list.sub_goods_name }}</span>
                     </div>
                   </div>
                 </div>
@@ -295,5 +295,14 @@ export default {
   .cell-border:last-child {
     border: 0px;
   }
+}
+
+.line-num{
+  -webkit-line-clamp: 3; // 用来限制在一个块元素显示的文本的行数
+display: -webkit-box; // 将对象作为弹性伸缩盒模型显示
+-webkit-box-orient: vertical; //设置或检查伸缩盒对象的子元素的排列方式
+text-overflow: ellipsis; // 在多行文本的情况下，用...隐藏超出范围的文本
+word-break: break-all;
+overflow: hidden;
 }
 </style>

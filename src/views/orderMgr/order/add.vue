@@ -15,7 +15,7 @@
                   <div class="flex-c">
                     <span style="color:red;margin-right:6px;font-size:16px">*</span>
 
-                    <el-select v-model="scope.row.goods_id" filterable @change="val => onChangeGood(scope.row, val)" class="w300">
+                    <el-select v-model="scope.row.goods_id" filterable @change="val => onChangeGood(scope.row, val)" class="w300" :disabled="disabledEdit">
                       <el-option v-for="item in goodList" :key="item.id" :label="item.name" :value="item.id"> </el-option>
                     </el-select>
                   </div>
@@ -26,24 +26,24 @@
 
               <el-table-column label="实收金额(元)" min-width="150">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.actual_price" class="w200" @input="val => onInputNum(scope.row, val, 'actual_price', scope.$index)"  maxlength="8"/>
+                  <el-input v-model="scope.row.actual_price" class="w200" @input="val => onInputNum(scope.row, val, 'actual_price', scope.$index)" :disabled="disabledEdit" />
                 </template>
               </el-table-column>
 
               <el-table-column label="商品数量" min-width="150">
                 <template slot-scope="scope">
-                  <el-input v-model="scope.row.count" class="w200" @input="val => onInputNum(scope.row, val, 'count', scope.$index)" />
+                  <el-input v-model="scope.row.count" class="w200" @input="val => onInputNum(scope.row, val, 'count', scope.$index)" :disabled="disabledEdit" />
                 </template>
               </el-table-column>
 
               <el-table-column label="操作" width="100">
                 <template slot-scope="scope">
-                  <i class="el-icon-delete table-delete-btn" :class="{ disabled: scope.$index === 0 }" @click="detRow(scope.$index)"></i>
+                  <i class="el-icon-delete table-delete-btn" :class="{ disabled: scope.$index === 0 }" @click="detRow(scope.$index)" v-if="!disabledEdit"></i>
                 </template>
               </el-table-column>
             </el-table>
 
-            <div class="flex-cc add-row-wrap">
+            <div class="flex-cc add-row-wrap" v-if="!disabledEdit">
               <div @click="addRow">
                 <i class="el-icon-plus"></i>
                 <span>添加一行</span>
@@ -57,17 +57,17 @@
             </div>
 
             <el-form-item label="渠道类型" prop="channel_type">
-              <el-select v-model="buyer.channel_type" class="w200" @change="onChangeChannelType" filterable>
+              <el-select v-model="buyer.channel_type" class="w200" @change="onChangeChannelType" filterable :disabled="disabledEdit">
                 <el-option v-for="item in channelTypeList" :key="item.id" :label="item.name" :value="item.id"> </el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="代理商" prop="sales_agent_id" v-if="isNeedAgent" required>
-              <SelSalesAgent v-model="buyer.sales_agent_id" class="w200" filterable />
+              <SelSalesAgent v-model="buyer.sales_agent_id" class="w200" filterable :disabled="disabledEdit" />
             </el-form-item>
             <template v-else>
               <el-form-item label="手机号" prop="buyer_phone">
-                <SelPhoneCode v-model="buyer.phone_code_id" class="w200" />
-                <el-input v-model="buyer.buyer_phone" placeholder="请输入手机号" class="w250" @input="onInputPhone" />
+                <SelPhoneCode v-model="buyer.phone_code_id" class="w200" :disabled="disabledEdit" />
+                <el-input v-model="buyer.buyer_phone" placeholder="请输入手机号" class="w250" @input="onInputPhone" :disabled="disabledEdit" />
                 <div class="mark-icon-wrap" v-if="buyer.is_registered === 1">
                   <svg-icon icon-class="check" class-name="check-panel-icon" />
                   已注册
@@ -86,7 +86,7 @@
                 </div>
               </el-form-item>
               <el-form-item label="姓名" prop="buyer_name">
-                <el-input v-model="buyer.buyer_name" placeholder="请输入买家姓名" class="w450" />
+                <el-input v-model="buyer.buyer_name" placeholder="请输入买家姓名" class="w450" :disabled="disabledEdit" />
               </el-form-item>
             </template>
           </el-card>
@@ -132,7 +132,7 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="运费(元)" prop="express_price">
-                  <el-input v-model="buyer.express_price" class="w250" :maxlength="8" @input="onInputPrice" />
+                  <el-input v-model="buyer.express_price" class="w250" :maxlength="10" @input="onInputPrice" />
                 </el-form-item>
               </el-col>
               <el-col :span="8">
@@ -147,13 +147,13 @@
               </el-col>
               <el-col :span="8">
                 <el-form-item label="收款情况" prop="payment_type">
-                  <el-select v-model="buyer.payment_type" class="w125" @change="onChangePayment">
+                  <el-select v-model="buyer.payment_type" class="w125" @change="onChangePayment" :disabled="!!buyer.order_sn">
                     <el-option label="先款后货" :value="1"> </el-option>
                     <el-option label="先货后款" :value="2"> </el-option>
                   </el-select>
-                  <el-select v-model="buyer.order_status" class="w125" disabled>
-                    <el-option label="已收款" :value="10"> </el-option>
-                    <el-option label="未收款" :value="0"> </el-option>
+                  <el-select v-model="buyer.order_status" class="w125" :disabled="isOrderStatusEdit">
+                      <el-option label="已收款" :value="40"> </el-option>
+                      <el-option label="未收款" :value="0"> </el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -256,6 +256,14 @@ export default {
     isNeedAgent() {
       //是否要填入代理商
       return this.currChannelObj.order_type === 3
+    },
+    disabledEdit() {
+      //是否可以编辑
+      return this.buyer.order_status === 30
+    },
+    isOrderStatusEdit() {
+      //是否可以编辑
+      return !this.buyer.order_sn || this.buyer.payment_type === 1
     }
   },
   watch: {
@@ -263,7 +271,7 @@ export default {
       this.buyer.buyer_phone = val.replace(/[^\d]/g, "")
     },
     "buyer.express_price"(val) {
-      this.buyer.express_price =   val.replace(/[^\d.]/g, "")
+      this.buyer.express_price = val.replace(/^\D*((\d{0,6})(?:\.\d{0,2})?).*$/g, "$1")
     }
   },
   created() {
@@ -343,6 +351,10 @@ export default {
           is_registered: data.is_registered,
           is_first: data.is_first
         }
+
+        if(this.buyer.order_status === 20 || this.buyer.order_status === 30) {
+          this.buyer.order_status = 40
+        }
       })
     },
     addRow() {
@@ -356,14 +368,15 @@ export default {
 
     onChangePayment(val) {
       if (val === 1) {
-        this.buyer.order_status = 10
+        this.buyer.order_status = 40
       } else if (val === 2) {
         this.buyer.order_status = 0
       }
     },
     onInputNum(row, val, type, index) {
       if (type === "actual_price") {
-        row[type] = val.replace(/[^\d.]/g, "")//清除"数字"和"."以外的字符
+        // row[type] = val.replace(/[^\d.]/g, "")//清除"数字"和"."以外的字符
+        row[type] = val.replace(/^\D*((\d{0,6})(?:\.\d{0,2})?).*$/g, "$1")
         // row[type] =  parseFloat(row[type]).toFixed(2)
         // row[type] =  val.match(/^\d{1,6}(\.\d{1,2})$/g)[0] || null;
       }
@@ -375,7 +388,7 @@ export default {
         } else if (val < 1) {
           row[type] = 1
         }
-          // this.$set(row,type,row[type])
+        // this.$set(row,type,row[type])
       }
       this.onNum()
     },
@@ -389,9 +402,9 @@ export default {
       const payment_money = this.tableData.reduce((total, item) => {
         return total + (item.actual_price || 0) * (item.count || 0)
       }, 0)
-
+      console.log("payment_money:", payment_money)
       this.$set(this.buyer, "total_money", total_money)
-      this.$set(this.buyer, "payment_money", parseFloat(payment_money + parseFloat(this.buyer.express_price || 0))) //加上运费
+      this.$set(this.buyer, "payment_money", parseFloat(payment_money + (parseFloat(this.buyer.express_price) || 0))) //加上运费
     },
     onChangeGood(row, val) {
       const currGood = this.goodList.find(item => item.id === val)

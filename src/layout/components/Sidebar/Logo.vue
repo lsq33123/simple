@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      title: '汽修管理后台',
+      title: '优胜汽修大师',
       logo: logoImg
     }
   }

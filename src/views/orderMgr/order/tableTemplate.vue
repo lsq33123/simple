@@ -14,14 +14,14 @@
             <span class="text-btn" @click="onCopy(item.order_sn)">复制</span>
           </span>
           <span>下单时间：{{ item.create_time }}</span>
-          <span>订单来源：{{ item.order_type_name }}</span>
+          <span >订单来源：{{ item.order_type_name }}</span>
         </div>
         <div class="row-info flex">
           <div v-for="(col, cIndex) in columns" :key="cIndex" v-show="col.show" class="row-info-item" :style="{ 'min-width': col.width + 'px' }">
             <div v-if="col.prop === 'goods_name'" class="row-info-item-prop">
               <div class="flex flex-align-center con-cell" v-for="(good, gindex) in item.order_goods" :key="gindex">
                 <img :src="good.goods_pic" />
-                <span class="color-blue ml10">{{ good.goods_name }}</span>
+                <span class="color-blue ml10 line-num">{{ good.goods_name }}</span>
               </div>
             </div>
             <div v-else-if="col.prop === 'order_status_name'" class="flex flex-align-center con-cell row-info-item-prop">
@@ -58,7 +58,7 @@
                 <span class="text-btn mr10" @click="onRemark(item.order_sn)">备注</span>
                 <span class="text-btn mr10" @click="onSend(item.order_sn)" v-if="item.order_status ===10 || item.order_status ===20">发货</span>
                 <span class="text-btn mr10" @click="onCancel(item.order_sn)" v-if="item.order_type ===1 &&  item.order_status === 0">取消订单</span>
-                <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999 && item.order_type ===2" @click="onEdit(item.id)">编辑</span>
+                <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999 &&  item.order_status !== 40 && item.order_type ===2" @click="onEdit(item.id,item.order_status)">编辑</span>
                 <span class="text-btn mr10" v-if="item.order_status !== 9998 &&  item.order_status !== 9999">发起售后</span>
                 <span class="text-btn mr10" @click="onHistory(item.order_sn)">操作历史</span>
               </div>
@@ -115,8 +115,8 @@ export default {
       // this.currOrderNo = order_sn
       this.$router.push("/orderMgr/orderDet?orderId=" + id)
     },
-    onEdit(id){
-      this.$router.push("/orderMgr/editOrderList?orderId=" + id)
+    onEdit(id,order_status){
+      this.$router.push("/orderMgr/editOrderList?orderId=" + id )
     },
     onSend(order_sn){
       this.currOrderNo = order_sn
@@ -237,5 +237,14 @@ export default {
 
 .con-cell + .con-cell{
   border-top:1px solid  #dfe6ec;
+}
+
+.line-num{
+  -webkit-line-clamp: 3; // 用来限制在一个块元素显示的文本的行数
+display: -webkit-box; // 将对象作为弹性伸缩盒模型显示
+-webkit-box-orient: vertical; //设置或检查伸缩盒对象的子元素的排列方式
+text-overflow: ellipsis; // 在多行文本的情况下，用...隐藏超出范围的文本
+word-break: break-all;
+overflow: hidden;
 }
 </style>

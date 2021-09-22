@@ -79,7 +79,7 @@ export default {
         {
           label: "发货信息",
           prop: "v10",
-          width: 100,
+          width: 150,
           show: true
         },
         {
